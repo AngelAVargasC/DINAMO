@@ -1,0 +1,2892 @@
+/* ============================================================
+   DINAMO — Gym | Active Hub · Polanco
+   Propuesta 2 · "Santuario del alto rendimiento"
+
+   Criterio: lujo silencioso. El amarillo de marca deja de ser
+   superficie y pasa a ser acento (líneas, hovers, un dato); el
+   peso visual lo llevan la fotografía, el aire y la tipografía
+   ligera a gran tamaño.
+   ============================================================ */
+
+@font-face {
+  font-family: "Acumin";
+  src: url("/fonts/AcuminVariableConcept.otf") format("opentype");
+  font-weight: 100 900;
+  font-stretch: 50% 115%;
+  font-display: swap;
+}
+
+:root {
+  --bone: #f4f1ec;
+  --bone-2: #ebe7e0;
+  --ink: #14130f;
+  --ink-soft: #2a2823;
+  --stone: #8a857c;
+  /* grises del brandbook, definidos como porcentajes de Process Black C:
+     el 50 % da exactamente el #949290 de la paleta, así que el 75 % sale de
+     la misma regla */
+  --gris-oscuro: #5e5b58;
+  --gris: #949290;
+  --gris-claro: #c9c9c8;
+  --line: rgba(20, 19, 15, 0.14);
+  --line-light: rgba(244, 241, 236, 0.22);
+  --accent: #ffe700;
+  /* submarcas: the lab (morados + magenta) y OASIS (aurora sobre índigo) */
+  --lab-deep: #24083e;
+  --lab-mid: #301b59;
+  --lab-pink: #e3197f;
+  --oasis-indigo: #2c3a8c;
+
+  --font: "Acumin", "Helvetica Neue", Arial, sans-serif;
+  --pad: clamp(1.25rem, 5vw, 5.5rem);
+  --maxw: 88rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --slow: 1.1s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bone);
+  -webkit-text-size-adjust: 100%;
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ---------- color de fondo por sección ----------
+   Cada sección pinta su propio color y el cambio entre dos colores se resuelve
+   como un DEGRADADO EN EL BORDE, no como un fundido temporal. Así la
+   transición va ligada al scroll por geometría: el texto nunca puede quedar
+   sobre el color equivocado, que es lo que fallaba con el lienzo animado. */
+.bg-bone { background-color: var(--bone); }
+.bg-ink  { background-color: var(--ink); }
+.bg-gold { background-color: var(--accent); }
+/* Process Black C al 25 %, el gris claro del brandbook */
+.bg-gris { background-color: var(--gris-claro); }
+
+/* Los fondos cambian con línea limpia, sin empalme en degradado: cada
+   sección pinta su color y el corte entre dos es el borde mismo (decisión
+   de Angel; el sistema .fade anterior se eliminó entero). */
+
+body {
+  font-family: var(--font);
+  background: var(--bone);
+  color: var(--ink);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+::selection { background: var(--ink); color: var(--bone); }
+
+/* ---------- tipografía ---------- */
+/* (los rótulos .eyebrow se eliminaron a petición de Angel: los titulares
+   abren cada sección solos) */
+.display {
+  font-weight: 200;
+  font-size: clamp(2.4rem, 6.2vw, 6rem);
+  line-height: 1.03;
+  letter-spacing: -0.015em;
+}
+/* La palabra clave va en amarillo, sin fondo ni filete: mismo tratamiento en
+   el hero y en el resto de titulares. */
+.display em, .hero-claim em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--accent);
+}
+.lede {
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  max-width: 46ch;
+}
+.small {
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--stone);
+}
+
+/* ---------- estructura ---------- */
+.sec { position: relative; }
+.wrap {
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+.pad-y { padding-block: clamp(6rem, 14vh, 11rem); }
+
+/* ---------- reveals ---------- */
+/* Asimetría deliberada: la ENTRADA es lenta y escalonada (cinemática), la
+   SALIDA es corta y sin retardo — el retardo por índice sólo tiene sentido al
+   entrar; al salir deja bloques a medio desvanecer arrastrándose. */
+.rv {
+  opacity: 0;
+  transform: translateY(1.8rem);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+.rv.in {
+  opacity: 1;
+  transform: none;
+  transition: opacity var(--slow) var(--ease), transform var(--slow) var(--ease);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+/* bidireccional: al salir por arriba se retira hacia arriba, de modo que el
+   gesto siempre acompaña al sentido del scroll */
+.rv.above { transform: translateY(-1.8rem); }
+
+/* variantes: el ritmo del recorrido no debe ser el mismo en todo */
+.rv[data-rv="left"] { transform: translateX(-2.4rem); }
+.rv[data-rv="right"] { transform: translateX(2.4rem); }
+.rv[data-rv="scale"] { transform: scale(0.96); }
+/* OJO: el atributo cuenta como clase y estas reglas van DESPUÉS de .rv.in,
+   así que sin este override los bloques con variante se quedaban clavados en
+   su estado de entrada (las tarjetas del carrusel, a 0.96, dejaban huecos). */
+.rv.in[data-rv] { transform: none; }
+.rv.above[data-rv="left"] { transform: translateX(-2.4rem) translateY(-1rem); }
+.rv.above[data-rv="right"] { transform: translateX(2.4rem) translateY(-1rem); }
+.rv.above[data-rv="scale"] { transform: scale(0.96); }
+
+/* titulares por línea: cada una sube desde su propia máscara */
+.ln { display: block; overflow: hidden; padding-top: 0.14em; margin-top: -0.14em; }
+.ln > i { display: block; font-style: normal; }
+/* Cada palabra sube desde la máscara de su línea, escalonada. El retardo suma
+   la línea y la posición de la palabra, así el titular se arma de izquierda a
+   derecha y de arriba abajo en vez de aparecer de golpe. */
+.wd {
+  display: inline-block;
+  font-weight: inherit;
+  font-style: inherit;
+  transform: translateY(112%);
+  transition: transform 0.55s var(--ease);
+  will-change: transform;
+}
+.in > .ln .wd, .in .ln .wd {
+  transform: none;
+  transition: transform 1.05s var(--ease);
+  transition-delay: calc((var(--li) * 90ms) + (var(--wi) * 62ms));
+}
+.above .ln .wd { transform: translateY(-112%); }
+@media (prefers-reduced-motion: reduce) {
+  .wd { transform: none; transition: none; }
+}
+/* la imagen se descubre con una cortina en vez de aparecer de golpe */
+.rv-img {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.6s var(--ease);
+}
+.rv-img.in {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.4s var(--ease);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+.rv-img.above { clip-path: inset(0 0 100% 0); }
+/* variantes horizontales: wipel abre de izquierda a derecha, wiper al revés */
+.rv-img[data-rv="wipel"] { clip-path: inset(0 100% 0 0); }
+.rv-img[data-rv="wipel"].in { clip-path: inset(0 0 0 0); }
+.rv-img[data-rv="wipel"].above { clip-path: inset(0 100% 0 0); }
+.rv-img[data-rv="wiper"] { clip-path: inset(0 0 0 100%); }
+.rv-img[data-rv="wiper"].in { clip-path: inset(0 0 0 0); }
+.rv-img[data-rv="wiper"].above { clip-path: inset(0 0 0 100%); }
+/* mientras la cortina abre, la foto asienta desde un leve acercamiento:
+   la propiedad scale compone con el transform del parallax sin pisarlo */
+.rv-img img { scale: 1.07; transition: scale 1.7s var(--ease); }
+.rv-img.in img { scale: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .rv, .rv-img { opacity: 1; transform: none; clip-path: none; transition: none; }
+  .rv-img img { scale: 1; transition: none; }
+  .ln > i { transform: none; transition: none; }
+}
+
+/* ---------- media con parallax interno ---------- */
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--bone-2);
+}
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translate3d(0, var(--py, 0px), 0) scale(1.14);
+  will-change: transform;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+/* ---------- cabecera ----------
+   Hamburguesa, marca centrada y una sola acción. Los siete enlaces de sección
+   se van al menú a pantalla completa: en la cabecera competían con la marca y
+   con el CTA, que es lo único que tiene que llevarse el clic. */
+.hd {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.4rem var(--pad);
+  /* el hero es blanco: la cabecera arranca en tinta, no en hueso */
+  color: var(--ink);
+  transition: color 0.6s var(--ease), padding 0.6s var(--ease),
+              background-color 0.6s var(--ease), transform 0.55s var(--ease);
+}
+/* sin backdrop-filter (petición de Angel): fondo hueso pleno, sin desenfoque */
+.hd.solid {
+  color: var(--ink);
+  background: var(--bone);
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+/* se retira al bajar y vuelve al subir: el contenido manda, no el cromo */
+.hd.hide { transform: translateY(-102%); }
+/* con el menú abierto la cabecera vive sobre el fondo oscuro del propio menú */
+.hd.open {
+  color: var(--bone);
+  background: transparent;
+  border-bottom-color: transparent;
+  transform: none;
+}
+
+.hd-logo {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: inherit;
+  text-decoration: none;
+}
+/* Marca completa en tinta: el amarillo del encabezado competía con el isotipo
+   3D del fondo, que ahora es el único que lleva color. */
+.hd-logo svg { width: clamp(1.5rem, 2.4vw, 2.1rem); height: auto; color: inherit; }
+.hd-logo b {
+  font-weight: 500;
+  font-stretch: 112%;
+  font-size: clamp(1.02rem, 1.5vw, 1.32rem);
+  letter-spacing: 0.34em;
+}
+
+/* botón del menú: dos filetes que se cruzan al abrir */
+.hd-burger {
+  justify-self: start;
+  display: grid;
+  gap: 0.42rem;
+  width: 1.65rem;
+  padding: 0.5rem 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.hd-burger span {
+  display: block;
+  height: 1.5px;
+  width: 100%;
+  background: currentColor;
+  transition: transform 0.45s var(--ease), width 0.45s var(--ease);
+}
+.hd-burger span:nth-child(2) { width: 62%; }
+.hd-burger:hover span:nth-child(2) { width: 100%; }
+.hd.open .hd-burger span:nth-child(1) { transform: translateY(0.29rem) rotate(45deg); }
+.hd.open .hd-burger span:nth-child(2) { width: 100%; transform: translateY(-0.29rem) rotate(-45deg); }
+
+.hd-cta {
+  justify-self: end;
+  font-size: clamp(0.7rem, 0.95vw, 0.84rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  /* bloque sólido en el amarillo oficial; la tinta encima es lo único que se
+     lee bien sobre ese tono */
+  background: var(--accent);
+  color: var(--ink);
+  /* cuadrado, sin radios (petición de Angel) */
+  padding: 0.85rem 1.7rem;
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+}
+.hd-cta:hover { background: var(--ink); color: var(--accent); }
+/* el desvío magnético lo escribe ui.ts en --mx/--my */
+.hd-cta, .btn {
+  transform: translate(var(--mx, 0), var(--my, 0));
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease),
+              border-color 0.4s var(--ease), transform 0.35s var(--ease);
+}
+
+/* ---------- menú a pantalla completa ---------- */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: var(--ink);
+  color: var(--bone);
+  display: flex;
+  flex-direction: column;
+  /* Justificado abajo, con nueve enlaces el contenido desbordaba por arriba y
+     los primeros se perdían fuera de la pantalla, sin forma de alcanzarlos.
+     Ahora crece desde arriba, el pie se empuja solo y el conjunto puede
+     desplazarse si aun así no cabe. */
+  justify-content: flex-start;
+  gap: clamp(1.5rem, 4vh, 3rem);
+  padding: clamp(5.5rem, 13vh, 8rem) var(--pad) clamp(1.6rem, 4vh, 2.6rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.55s var(--ease), visibility 0.55s;
+}
+.menu.open { opacity: 1; visibility: visible; }
+
+.menu-nav { display: grid; }
+.menu-nav a {
+  /* la máscara por enlace deja que cada uno suba desde su propia línea */
+  display: block;
+  overflow: hidden;
+  padding-block: clamp(0.15rem, 0.6vh, 0.4rem);
+  color: inherit;
+  text-decoration: none;
+}
+.menu-nav a > i {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 200;
+  /* medida pensada para que las nueve secciones quepan de una vez */
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  line-height: 1.14;
+  letter-spacing: -0.015em;
+  transform: translateY(105%);
+  opacity: 0.75;
+  transition: transform 0.8s var(--ease), opacity 0.5s var(--ease), color 0.4s;
+  transition-delay: calc(var(--i) * 45ms);
+}
+.menu.open .menu-nav a > i { transform: none; }
+/* rodillo: la etiqueta sale por arriba y su copia entra desde abajo */
+.roll { display: block; transition: transform 0.55s var(--ease); }
+.roll-2 { position: absolute; left: 0; top: 100%; width: 100%; }
+.menu-nav a:hover .roll { transform: translateY(-100%); }
+@media (prefers-reduced-motion: reduce) { .roll { transition: none; } }
+.menu-nav a:hover > i { opacity: 1; color: var(--accent); }
+.menu-nav a.on > i { opacity: 1; }
+
+.menu-foot {
+  margin-top: auto;
+  display: flex;
+  gap: clamp(1.5rem, 5vw, 5rem);
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line-light);
+  padding-top: clamp(1.2rem, 3vh, 2rem);
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity 0.6s var(--ease) 0.3s, transform 0.6s var(--ease) 0.3s;
+}
+.menu.open .menu-foot { opacity: 1; transform: none; }
+.menu-foot h5 {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 236, 0.45);
+  margin-bottom: 0.7rem;
+}
+.menu-foot a {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(244, 241, 236, 0.85);
+  text-decoration: none;
+  transition: color 0.35s;
+}
+.menu-foot a:hover { color: var(--accent); }
+
+/* con el menú abierto la página de debajo no se mueve */
+html.menu-lock { overflow: hidden; }
+
+@media (max-width: 720px) {
+  .hd-logo b { font-size: 0.8rem; letter-spacing: 0.28em; }
+  .hd-cta { font-size: 0.56rem; letter-spacing: 0.18em; padding: 0.62rem 1rem; }
+}
+@media (max-width: 520px) {
+  /* a este ancho la marca centrada y el CTA no caben juntos: manda la marca */
+  .hd { grid-template-columns: 1fr auto 1fr; }
+  .hd-cta { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hd, .menu, .menu-nav a > i, .menu-foot, .hd-burger span { transition-duration: 0.01ms; }
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+/* Hero en blanco: la atleta va recortada, sin su fondo, apoyada en el borde
+   inferior. El texto ya no compite contra una foto, así que no hace falta velo
+   y la tipografía puede ir en tinta. */
+.hero {
+  position: relative;
+  background: linear-gradient(168deg, #ffffff 0%, #fbfaf8 46%, #f2efea 100%);
+  color: var(--ink);
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+}
+/* ---------- hero por capas ----------
+   La atleta va recortada y el fondo se construye: degradado, un halo cálido,
+   el isotipo a gran escala y unos filetes en diagonal. Cada capa se desplaza
+   distinto con el puntero, que es de donde sale la profundidad.
+   Nada de filter: blur() aquí — sobre capas que se mueven se come los fps;
+   la suavidad la dan los propios degradados. */
+.hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+/* El lienzo WebGL pinta la aurora y el isotipo en 3D. Las capas CSS de abajo
+   siguen ahí como respaldo: si el contexto no arranca, el hero no se queda
+   desnudo. Cuando sí arranca, se apagan las dos que el lienzo reemplaza. */
+.hero-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero.gl-on .hb-iso,
+.hero.gl-on .hb-rules { display: none; }
+.hb {
+  position: absolute;
+  display: block;
+  transform: translate3d(var(--dx, 0px), var(--dy, 0px), 0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+/* El isotipo, entero y en el hueco libre entre el titular y la figura. Antes
+   iba enorme y a la derecha: se cortaba contra ella y las barras se leían como
+   losas grises sueltas en vez de como la marca. */
+.hb-iso {
+  right: auto;
+  left: 48%;
+  top: 11vh;
+  width: min(26vw, 19rem);
+  opacity: 0.06;
+  color: var(--ink);
+}
+.hb-iso svg { width: 100%; height: auto; display: block; }
+/* filetes al ángulo del isotipo, difuminados hacia los bordes */
+.hb-rules {
+  inset: 0;
+  background: repeating-linear-gradient(-45deg,
+    transparent 0 78px, rgba(20, 19, 15, 0.05) 78px 79px);
+  -webkit-mask-image: radial-gradient(70% 65% at 62% 45%, #000 10%, transparent 78%);
+  mask-image: radial-gradient(70% 65% at 62% 45%, #000 10%, transparent 78%);
+}
+/* sombra de apoyo: sin ella la figura recortada parece pegada, no de pie */
+.hb-floor {
+  left: 38%;
+  right: -2%;
+  bottom: -10%;
+  height: 34vh;
+  background: radial-gradient(50% 42% at 52% 62%, rgba(20, 19, 15, 0.15) 0%, transparent 70%);
+}
+
+.hero-figure {
+  position: absolute;
+  /* Más grande y corrida a la derecha: el final de los mechones queda fuera
+     del encuadre, que es donde se notaba el canto del recorte. Y baja un poco
+     para que al crecer no se le corte la cabeza por arriba. */
+  /* corrida a la izquierda un 20 % de su propio ancho */
+  right: 1.3vw;
+  bottom: -4vh;
+  z-index: 1;
+  /* Un punto más alta: así el borde superior del recorte —donde los mechones
+     acaban en línea recta— queda por encima del filo de la pantalla. */
+  height: min(111vh, 73rem);
+}
+.hero-figure img {
+  height: 100%;
+  width: auto;
+  display: block;
+  transform: translate3d(var(--dx, 0px), var(--dy, 0px), 0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-figure { animation: none; }
+  .hb, .hero-figure img { transition: none; }
+}
+@media (max-width: 900px) {
+  .hero-figure { height: 60vh; right: -16vw; opacity: 0.42; }
+  .hb-iso { opacity: 0.05; }
+}
+/* Velo claro por la izquierda: el final del titular caía sobre el brazo oscuro
+   de la atleta. Así la tipografía conserva su tamaño y siempre tiene lecho. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  /* El empalme hacia el hueso lo cierra el propio hero: puesto en la sección de
+     abajo quedaba recortado a su .wrap y se veía como una banda blanca. */
+  /* El lecho de legibilidad es una elipse bajo el titular, no una franja
+     entera: la banda al 94% se comía la máquina de la esquina izquierda de
+     la foto (petición de Angel: que se vea). Sin degradado de empalme hacia
+     el hueso: los fondos cambian con línea limpia. */
+  /* Reducido y focalizado SOLO sobre «transforms» (petición de Angel): es la
+     palabra amarilla que se perdería contra la barra amarilla; el resto del
+     titular va en tinta y no necesita lecho. */
+  background:
+    radial-gradient(ellipse 22% 13% at 28% 71%,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.45) 55%,
+      transparent 100%);
+  pointer-events: none;
+}
+/* estrechando, la atleta invade el titular: se retira y se aclara */
+@media (max-width: 900px) {
+  .hero-media img { object-position: 78% 50%; opacity: 0.45; }
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  /* El hero rompe la retícula centrada del resto a propósito: el titular se
+     pega al margen izquierdo y sube, para que la atleta respire por abajo. */
+  max-width: none;
+  margin-inline: 0;
+  padding: 0 var(--pad) clamp(7rem, 26vh, 16rem);
+}
+/* Las tres barras del isotipo, en grande, presidiendo el titular.
+   OJO: sin la clase .mark — su animación (translate + transform-origin
+   sobre el transform del atributo) desplaza las barras fuera del viewBox
+   a este tamaño. Aquí entran sólo con opacidad escalonada. */
+
+/* ---------- icono de las tres rayitas en tamaño medio ----------
+   Para presidir cabeceras de sección: sólo el isotipo, sin wordmark.
+   SIN la clase .mark (su animación desplaza
+   las barras fuera del viewBox y el SVG las recorta); entrada sólo por
+   opacidad, barra a barra. */
+.sec-mark { margin-bottom: clamp(1.1rem, 2.6vh, 1.8rem); }
+.sec-mark svg {
+  display: block;
+  width: clamp(3rem, 4.6vw, 4.6rem);
+  height: auto;
+  color: var(--accent);
+}
+/* sobre amarillo, las barras van en tinta (regla de marca) */
+.gold .sec-mark svg { color: var(--ink); }
+/* en las secciones centradas, el icono también */
+.creed .sec-mark svg, .cta .sec-mark svg,
+#membresias > .sec-mark svg { margin-inline: auto; }
+.sec-mark rect { opacity: 0; transition: opacity 0.6s var(--ease); }
+.sec-mark rect:nth-child(1) { transition-delay: 0.08s; }
+.sec-mark rect:nth-child(2) { transition-delay: 0.22s; }
+.sec-mark rect:nth-child(3) { transition-delay: 0.36s; }
+.sec-mark.in rect { opacity: 1; }
+
+.hero-claim {
+  font-weight: 200;
+  /* un 10 % menos que el 2.6/7/7 anterior */
+  font-size: clamp(2.34rem, 6.3vw, 6.3rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  max-width: 13ch;
+}
+/* el titular del hero va en el negro de la marca, no en gris */
+.hero-claim { color: var(--ink); }
+.hero-foot {
+  /* Sale del flujo y se ancla al borde inferior: dentro del flujo dependía del
+     alto del titular y nunca llegaba a la esquina. */
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: clamp(1.6rem, 4.5vh, 3rem);
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+  /* Entra al cargar, no con el scroll: anclado al borde inferior queda por
+     debajo del umbral de reveal y en la primera pantalla no llegaba a
+     dispararse nunca. */
+}
+@media (prefers-reduced-motion: reduce) { .hero-foot { animation: none; } }
+.hero-foot .small { color: var(--stone); }
+.hero-scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.8;
+}
+.hero-scroll i {
+  display: block;
+  width: 3.2rem;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+  animation: line-pulse 2.6s var(--ease) infinite;
+}
+@keyframes line-pulse {
+  0%, 100% { transform: scaleX(0.4); opacity: 0.5; }
+  50% { transform: scaleX(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-media img { animation: none; }
+  .hero-scroll i { animation: none; }
+}
+
+/* ============================================================
+   MANIFIESTO · collage en cruz
+   Cinco piezas dibujan la cruz (brazos + centro) y tres pequeñas
+   flotan por delante sobre las juntas. La profundidad la da el
+   parallax: cuanto más al frente la pieza, más rápido deriva
+   (data-par 0.04 el centro → 0.16 las flotantes). Reutiliza la
+   cortina y el asentamiento de .rv-img.
+   ============================================================ */
+.cross {
+  margin-top: clamp(4rem, 10vh, 7rem);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: clamp(3.6rem, 7.5vw, 6.5rem);
+  gap: clamp(0.8rem, 1.6vw, 1.4rem);
+}
+.cross-t { position: relative; overflow: hidden; }
+/* dolly-in: el marco queda quieto y la foto hace zoom hacia dentro con el
+   scroll (--cz desde ui.ts); la profundidad la da el recorrido distinto de
+   cada pieza */
+.cross-t img {
+  transform: scale(var(--cz, 1));
+  will-change: transform;
+}
+.cross .t1 { grid-area: 1 / 5 / 3 / 9; }
+.cross .t2 { grid-area: 3 / 1 / 6 / 5; }
+.cross .t4 { grid-area: 3 / 5 / 6 / 9; }
+.cross .t5 { grid-area: 3 / 9 / 6 / 13; }
+.cross .t7 { grid-area: 6 / 5 / 8 / 9; }
+/* las flotantes: por delante, con marco hueso para leerse como collage */
+.cross .t3 { grid-area: 2 / 3 / 4 / 5; }
+.cross .t8 { grid-area: 2 / 9 / 4 / 11; }
+.cross .t6 { grid-area: 5 / 8 / 7 / 10; }
+.cross .t3, .cross .t6, .cross .t8 {
+  z-index: 2;
+  border: 5px solid var(--bone);
+}
+@media (max-width: 900px) {
+  .cross { grid-template-columns: repeat(2, 1fr); grid-auto-rows: clamp(7rem, 24vw, 11rem); }
+  .cross-t { grid-area: auto; }
+  .cross .t4 { grid-column: 1 / -1; }
+  .cross .t3, .cross .t6, .cross .t8 { display: none; }
+}
+
+/* ============================================================
+   MANIFIESTO
+   ============================================================ */
+/* El isotipo es FONDO a la izquierda (petición final de Angel): absoluto,
+   pegado al borde izquierdo de la pantalla, detrás del titular. Los textos
+   no se mueven: conservan su alineación con el párrafo de abajo. */
+.manifest-head { position: relative; }
+.manifest-head .display { position: relative; z-index: 1; }
+.manifest-head .sec-mark {
+  position: absolute;
+  /* al borde izquierdo del viewport, no del wrap */
+  left: calc(50% - 50vw);
+  top: 50%;
+  translate: 0 -50%;
+  margin: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.manifest-head .sec-mark svg {
+  width: clamp(9rem, 14vw, 14rem);
+  height: auto;
+}
+.manifest .display { max-width: 22ch; margin-top: 0; }
+
+/* en estrecho no hay margen izquierdo que ocupar: fuera el fondo */
+@media (max-width: 900px) {
+  .manifest-head .sec-mark { display: none; }
+}
+/* Fila en flex, no en grid: el sangrado de la banda hasta el borde del
+   viewport (margin-right: calc(50% - 50vw)) resuelve el % contra el
+   contenedor flex; en un item de grid resolvería contra su celda y el
+   borde no llegaría. */
+.manifest-grid {
+  margin-top: clamp(3rem, 7vh, 5rem);
+  display: flex;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+.manifest-grid .lede { flex: 0 1 46ch; }
+/* La banda de KPIs: rectángulo amarillo que corre desde el borde derecho de
+   la pantalla y se detiene antes de chocar con el texto. Cifras en tinta,
+   grandes, sin filete. */
+.manifest-figures {
+  flex: 1;
+  margin-right: calc(50% - 50vw);
+  background: var(--accent);
+  padding: clamp(2.4rem, 5vh, 4rem) clamp(2rem, 5vw, 5.5rem);
+  display: flex;
+  justify-content: space-between;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+/* Entrada de la banda: nace en el borde derecho con ancho cero y se abre
+   hacia la izquierda hasta su sitio (barrido por clip, no por escala: la
+   escala deformaría las cifras). La salida es corta, como el resto. */
+.manifest-figures.rv {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.6s var(--ease);
+}
+.manifest-figures.rv.in {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.5s var(--ease) 0.25s;
+}
+.figure b {
+  display: block;
+  font-size: clamp(2.8rem, 5vw, 4.6rem);
+  font-weight: 250;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.figure span {
+  display: block;
+  margin-top: 0.7rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(20, 19, 15, 0.62);
+}
+@media (max-width: 900px) {
+  .manifest-grid { flex-direction: column; align-items: stretch; }
+  /* en columna, la banda sangra por los dos lados */
+  .manifest-figures { margin-inline: calc(50% - 50vw); padding-inline: var(--pad); }
+}
+
+/* ============================================================
+   UNIVERSO · todas las fotos flotando en 3D
+   La sección mide varias pantallas y el escenario queda pegado
+   (sticky): el scroll no baja la página, mueve la CÁMARA
+   (--cam desde ui.ts) a través de una nube de fotos repartidas
+   en profundidad. Cada foto además se mece con un vaivén propio.
+   ============================================================ */
+.uni { position: relative; height: 340vh; }
+.uni-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: clip;
+  perspective: 1000px;
+}
+/* La oscuridad va atada al scroll (--udark desde ui.ts): la sección arranca
+   en hueso como su vecina, la luz se apaga al entrar en el universo y vuelve
+   a encenderse al salir hacia Pilates — sin corte de sección. */
+.uni-dark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--ink);
+  opacity: var(--udark, 0);
+}
+.uni-cloud {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(var(--cam, 0px));
+  will-change: transform;
+}
+.uni-it {
+  position: absolute;
+  left: var(--ux);
+  top: var(--uy);
+  width: var(--uw);
+  aspect-ratio: var(--ua);
+  margin: 0;
+  transform: translate3d(-50%, -50%, var(--uz));
+  opacity: var(--uo, 0);
+  overflow: hidden;
+}
+.uni-it img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Sin vaivén propio: eran 45 animaciones infinitas a la vez, y cada una
+     obliga al compositor a trabajar en todos los frames aunque nada se mueva.
+     El movimiento ya lo da la cámara al atravesar la nube. */
+}
+/* lecho oscuro tras el texto, para que la nube no se lo coma */
+.uni-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--udark, 0);
+  background: radial-gradient(46% 34% at 50% 50%,
+    rgba(20, 19, 15, 0.72) 0%, rgba(20, 19, 15, 0.35) 55%, transparent 100%);
+}
+.uni-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 1.4rem;
+  pointer-events: none;
+  /* acto 1: el copy sube de abajo arriba, antes de que llegue la oscuridad */
+  opacity: var(--utext, 0);
+  translate: 0 calc((1 - var(--utext, 0)) * 3rem);
+}
+/* el color del texto acompaña a la luz: tinta sobre hueso al principio,
+   hueso cuando la sala ya está a oscuras */
+.uni-k {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.52em;
+  text-transform: uppercase;
+  color: color-mix(in oklab,
+    rgb(244 241 236 / 55%) calc(var(--udark, 0) * 100%), rgb(20 19 15 / 55%));
+}
+.uni-line {
+  font-weight: 200;
+  font-size: clamp(2rem, 4.6vw, 4.2rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: color-mix(in oklab,
+    var(--bone) calc(var(--udark, 0) * 100%), var(--ink));
+}
+.uni-line em { font-style: normal; font-weight: 500; color: var(--accent); }
+@media (max-width: 900px) {
+  .uni { height: 260vh; }
+  /* la mitad de la nube: en pantalla chica 45 fotos son ruido y peso */
+  .uni-it:nth-child(2n) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .uni { height: auto; }
+  .uni-stage { position: relative; }
+  .uni-cloud { display: none; }
+  .uni-dark, .uni-veil, .uni-copy { opacity: 1; }
+  .uni-copy { translate: none; }
+  .uni-line { color: var(--bone); }
+  .uni-k { color: rgba(244, 241, 236, 0.55); }
+}
+
+/* ============================================================
+   BANDA A SANGRE
+   ============================================================ */
+.band {
+  position: relative;
+  background: var(--ink);
+  height: clamp(64vh, 86vh, 52rem);
+  overflow: hidden;
+}
+/* el recorte se declara por foto: encuadrar a ojo es la diferencia entre
+   una toma de arquitectura y una captura de pantalla */
+.band .media img { object-position: var(--pos, 50% 50%); }
+.band .media { position: absolute; inset: 0; }
+/* parallax de ventana: la foto mide la pantalla y ui.ts la contra-desplaza
+   (--fy = -top del marco); en una banda a sangre es donde más luce */
+.band .media img, .cta .media img {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 100vh;
+  transform: translate3d(0, var(--fy, 0px), 0);
+}
+/* .band-light: el fondo bajo la foto es hueso, no tinta — así el barrido de
+   entrada descubre la imagen sobre claro (pedido para la recepción) */
+.band.band-light { background: var(--bone); }
+/* .still: banda sin parallax de ventana — la ventana enseña la foto a tamaño
+   pantalla y nunca se ve entera; aquí la foto llena su marco y se queda
+   quieta (pedido para el lobby de recepción) */
+.band .media.still img {
+  height: 100%;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .band .media img, .cta .media img { height: 100%; transform: none; }
+}
+/* velo inferior: sin él, el pie de foto se pierde sobre las tomas claras */
+.band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(10, 10, 8, 0.72) 0%,
+                              rgba(10, 10, 8, 0.25) 34%, transparent 62%);
+  pointer-events: none;
+}
+.band-cap {
+  position: absolute;
+  z-index: 2;
+  left: var(--pad);
+  bottom: clamp(2rem, 6vh, 4.5rem);
+  color: var(--bone);
+  /* ancho generoso para que mande el corte de línea escrito en el markup y no
+     el límite de la caja */
+  max-width: min(92vw, 62rem);
+}
+.band-cap::before {
+  content: "";
+  display: block;
+  width: 2.4rem;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: 1.2rem;
+}
+.band-cap h3 {
+  /* Sobre una imagen a sangre el titular tiene que sostener toda la pantalla:
+     grande, ligero y muy justo de interlínea. */
+  font-size: clamp(2rem, 5.2vw, 5.4rem);
+  font-weight: 200;
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+}
+.band-cap .small { color: rgba(244, 241, 236, 0.8); margin-top: 1.4rem; font-size: 0.78rem; }
+
+/* ============================================================
+   EXPERIENCIA
+   ============================================================ */
+/* Isotipo grandote de fondo en la esquina superior derecha: marca de agua
+   amarilla que aparece suave (fundido lento + deriva desde la esquina).
+   El contenido de la sección vive por encima. */
+/* La capa cubre la sección y recorta: el isotipo sangra fuera del marco por
+   arriba y por la derecha, pegado a la esquina, sin invadir otras secciones. */
+.exp-bgmark.rv {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: clip;
+  pointer-events: none;
+  transform: translate(2.5rem, -2.5rem) scale(0.98);
+  transition: opacity 2s var(--ease) 0.25s, transform 2s var(--ease) 0.25s;
+}
+.exp-bgmark.rv.in { transform: none; }
+.exp-bgmark svg {
+  position: absolute;
+  /* la masa visual queda en la esquina: un tercio superior y un quinto
+     derecho sangran fuera del recorte */
+  top: clamp(-32rem, -27vw, -16rem);
+  right: clamp(-27rem, -22.5vw, -14rem);
+  /* un 300 % más grande que la primera versión, y a color pleno:
+     el amarillo de marca sin velo (petición de Angel) */
+  width: clamp(42rem, 78vw, 78rem);
+  height: auto;
+  color: var(--accent);
+  /* parallax propio: deriva con el scroll (--py del data-par de la capa) */
+  transform: translate3d(0, var(--py, 0px), 0);
+  will-change: transform;
+}
+.exp > .wrap { position: relative; z-index: 1; }
+
+.exp-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.exp-body {
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+.exp-list { list-style: none; border-top: 1px solid var(--line); }
+.exp-item { border-bottom: 1px solid var(--line); }
+.exp-item > button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2.6rem 1fr auto;
+  align-items: baseline;
+  gap: 1.2rem;
+  padding: clamp(1.1rem, 2.4vh, 1.7rem) 1.2rem;
+  background: none;
+  border: 0;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.exp-n {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--stone);
+}
+.exp-t {
+  font-size: clamp(1.15rem, 2.4vw, 1.9rem);
+  font-weight: 250;
+  transition: font-weight 0.3s;
+}
+.exp-item {
+  position: relative;
+  border-bottom: 1px solid var(--line);
+  transition: background-color 0.45s var(--ease);
+}
+/* hover y activa: bloque amarillo con texto en tinta, como en Un día
+   (sustituye al filete subrayado anterior, a petición de Angel) */
+.exp-item:hover, .exp-item.on { background: var(--accent); }
+.exp-item.on .exp-t { font-weight: 400; }
+.exp-item:hover .exp-t, .exp-item.on .exp-t { color: var(--ink); }
+.exp-item:hover .exp-n, .exp-item.on .exp-n { color: var(--ink); }
+.exp-item:hover .exp-d, .exp-item.on .exp-d { color: rgba(20, 19, 15, 0.66); }
+.exp-d {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--stone);
+  text-align: right;
+  max-width: 24ch;
+}
+.exp-viewer {
+  position: sticky;
+  top: 18vh;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--bone-2);
+}
+.exp-viewer img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 1s var(--ease), transform 1.6s var(--ease);
+}
+.exp-viewer img.on { opacity: 1; transform: scale(1); }
+@media (max-width: 900px) {
+  .exp-body { grid-template-columns: 1fr; }
+  .exp-viewer, .exp-d { display: none; }
+}
+
+/* ============================================================
+   SPLIT
+   ============================================================ */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+.split .media { aspect-ratio: 4 / 5; }
+.split-copy { padding: clamp(2.5rem, 7vw, 7rem); }
+.split-copy .display { font-size: clamp(2rem, 3.6vw, 3.4rem); }
+.split-copy .lede { margin-top: 1.6rem; }
+.split.rev .media { order: 2; }
+@media (max-width: 900px) {
+  .split { grid-template-columns: 1fr; }
+  .split.rev .media { order: 0; }
+  .split .media { aspect-ratio: 4 / 3; }
+}
+
+/* ============================================================
+   OSCURO
+   ============================================================ */
+.dark { color: var(--bone); }
+.dark .small { color: rgba(244, 241, 236, 0.6); }
+.dark .lede { color: rgba(244, 241, 236, 0.82); }
+.dark .exp-list, .dark .exp-item { border-color: var(--line-light); }
+.dark .exp-n, .dark .exp-d { color: rgba(244, 241, 236, 0.55); }
+.rec-grid {
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(1rem, 2vw, 2rem);
+}
+.rec-a { grid-column: 1 / span 5; grid-row: 1; aspect-ratio: 3 / 4; }
+.rec-b { grid-column: 6 / span 7; grid-row: 1; aspect-ratio: 16 / 11; align-self: end; }
+/* el logo ocupa el hueco que queda sobre la imagen derecha (misma celda que
+   rec-b: él arriba, la foto abajo — la fila la mide rec-a, más alta) */
+.rec-logo {
+  grid-column: 6 / span 7;
+  grid-row: 1;
+  align-self: start;
+  justify-self: stretch;
+}
+/* grandote: todo el ancho de la columna — su alto (~ancho/5.2) llena el
+   sobrante entre el tope de la fila y la foto derecha */
+.rec-logo img { width: 100%; height: auto; display: block; }
+
+/* ---------- coreografía de entrada de Recovery (pedida por Angel) ----------
+   Titular desde la izquierda; foto vertical con barrido izq→der (wipel);
+   foto horizontal subiendo con recorrido amplio; logo desde la derecha con
+   recorrido amplio. Todo bidireccional: montada sobre el sistema de reveals,
+   al salir y volver con el scroll se repite en ambos sentidos. */
+#recovery .display.rv { transform: translateX(clamp(-9rem, -12vw, -5rem)); }
+#recovery .display.rv.in { transform: none; }
+#recovery .display.rv.above {
+  transform: translateX(clamp(-9rem, -12vw, -5rem)) translateY(-1rem);
+}
+/* horizontal: sube, no cortina */
+.rec-b.rv-img {
+  clip-path: none;
+  opacity: 0;
+  transform: translateY(clamp(5rem, 14vh, 10rem));
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.rec-b.rv-img.in {
+  clip-path: none;
+  opacity: 1;
+  transform: none;
+  transition: opacity 1.5s var(--ease) 0.15s, transform 1.5s var(--ease) 0.15s;
+}
+.rec-b.rv-img.above {
+  clip-path: none;
+  opacity: 0;
+  transform: translateY(clamp(-10rem, -14vh, -5rem));
+}
+/* logo: de derecha a izquierda, amplio */
+.rec-logo.rv { transform: translateX(clamp(5rem, 12vw, 9rem)); }
+.rec-logo.rv.in {
+  transform: none;
+  transition: opacity 1.5s var(--ease) 0.25s, transform 1.5s var(--ease) 0.25s;
+}
+.rec-logo.rv.above {
+  transform: translateX(clamp(5rem, 12vw, 9rem)) translateY(-1rem);
+}
+.rec-list {
+  grid-column: 1 / -1;
+  margin-top: clamp(1.5rem, 4vh, 3rem);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1.2rem, 2.4vw, 2.4rem);
+  border-top: 1px solid var(--line-light);
+  padding-top: 2rem;
+}
+.rec-list h4 { font-size: 0.95rem; font-weight: 400; }
+.rec-list p { margin-top: 0.5rem; }
+@media (max-width: 900px) {
+  .rec-a, .rec-b { grid-column: 1 / -1; }
+  .rec-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================================
+   CREDO · YOU VS YOU
+   ============================================================ */
+.creed {
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(78vh, 96vh, 58rem);
+  display: grid;
+  place-items: center;
+  padding: clamp(6rem, 16vh, 12rem) var(--pad);
+  text-align: center;
+}
+/* La foto ocupa la sección entera y el texto va encima: el bloque negro con la
+   imagen aparte partía la escena en dos. */
+.creed-media { position: absolute; inset: 0; z-index: 0; }
+.creed-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 28%;
+  transform: translate3d(0, var(--py, 0px), 0) scale(1.14);
+}
+/* Velo doble: el radial hunde el centro para que la tipografía blanca no pelee
+   con los altos de la foto, y el lineal cierra los bordes contra el negro de
+   las secciones vecinas. */
+.creed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* velo mínimo (petición de Angel: la foto casi natural): un lecho suave
+     tras la tipografía y un cierre ligero en los bordes, nada más */
+  background:
+    radial-gradient(60% 46% at 50% 52%, rgba(10, 10, 8, 0.38) 0%, rgba(10, 10, 8, 0.16) 60%, transparent 100%),
+    linear-gradient(180deg, rgba(20, 19, 15, 0.38) 0%, transparent 22%,
+                    transparent 78%, rgba(20, 19, 15, 0.42) 100%);
+  pointer-events: none;
+}
+.creed-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 1.8rem;
+}
+.creed-line {
+  font-weight: 200;
+  font-size: clamp(2.2rem, 5.4vw, 5rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+}
+.creed-line em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--accent);
+}
+.creed-tag {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 236, 0.45);
+}
+
+/* ============================================================
+   UN DÍA
+   ============================================================ */
+/* timeline a la izquierda, marco de foto fijo a la derecha */
+/* La imagen ocupa TODO el espacio derecho (petición de Angel) y siempre hay
+   una fila seleccionada — la primera por defecto. Hover y activa van en
+   amarillo con texto en tinta. */
+.day-grid {
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 42%);
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+.day {
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.day-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 3rem);
+  padding: clamp(1.1rem, 2.4vh, 1.6rem) 1.2rem;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background-color 0.45s var(--ease);
+}
+/* hover y selección: mismo trato — bloque amarillo, texto en tinta */
+.day-row:hover, .day-row.on { background: var(--accent); }
+.day-h {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--stone);
+  transition: color 0.4s;
+}
+.day-t {
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  font-weight: 300;
+  transition: color 0.4s;
+}
+.day-d {
+  font-size: 0.72rem;
+  color: var(--stone);
+  text-align: right;
+  max-width: 34ch;
+  transition: color 0.4s;
+}
+.day-row:hover .day-h, .day-row.on .day-h,
+.day-row:hover .day-t, .day-row.on .day-t { color: var(--ink); }
+.day-row:hover .day-d, .day-row.on .day-d { color: rgba(20, 19, 15, 0.66); }
+
+/* El marco grande de la derecha: mide lo que mide el timeline y siempre
+   enseña la foto de la fila seleccionada (fundido entre fotos). */
+.day-peek {
+  position: relative;
+  align-self: stretch;
+  min-height: 24rem;
+  overflow: hidden;
+  background: var(--bone-2);
+}
+.day-peek img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+.day-peek img.on { opacity: 1; }
+
+@media (max-width: 900px) {
+  .day-grid { grid-template-columns: 1fr; }
+  /* en columna la foto sigue: bajo la lista, en proporción propia */
+  .day-peek { align-self: auto; min-height: 0; aspect-ratio: 4 / 3; }
+}
+@media (max-width: 760px) {
+  .day-row { grid-template-columns: 4.6rem 1fr; }
+  .day-d { display: none; }
+}
+
+/* ============================================================
+   LISTA CON VIÑETA AMARILLA
+   ============================================================ */
+.ticks { list-style: none; margin-top: 1.8rem; display: grid; gap: 0.7rem; }
+.ticks li {
+  position: relative;
+  padding-left: 1.4rem;
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: var(--ink-soft);
+}
+.ticks li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.55em;
+  width: 0.6rem; height: 2px;
+  background: var(--accent);
+}
+
+/* ============================================================
+   ECOSISTEMA
+   ============================================================ */
+/* Sección a PANTALLA COMPLETA: las tres tarjetas llenan el viewport juntas
+   y el titular vive encima de ellas. La expansión al hover se conserva. */
+.ecofs { position: relative; }
+/* velo superior: el titular claro necesita lecho sobre las fotos claras */
+.ecofs::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 36%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(20, 19, 15, 0.58) 0%,
+              rgba(20, 19, 15, 0.22) 55%, transparent 100%);
+}
+.ecofs-head {
+  position: absolute;
+  z-index: 3;
+  top: clamp(2.6rem, 7vh, 5rem);
+  left: var(--pad);
+  right: var(--pad);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+  color: var(--bone);
+  pointer-events: none;
+}
+.ecofs-head .small { color: rgba(244, 241, 236, 0.72); text-align: right; }
+
+/* Fila en flex, no en grid: al pasar el cursor la tarjeta SE EXPANDE
+   (flex-grow animado) y deja ver la foto completa, mientras las otras dos
+   ceden espacio — suave y reversible. */
+.eco {
+  margin-top: 0;
+  display: flex;
+  /* sin separación entre las tarjetas: franja continua */
+  gap: 0;
+  height: 100svh;
+}
+.ecofs .eco-card { height: auto; border-radius: 0; }
+.eco > .eco-card {
+  flex: 1 1 0;
+  min-width: 0;
+  transition: flex-grow 0.9s var(--ease);
+}
+/* expansión amplia: la tarjeta bajo el cursor domina la fila y la foto se ve
+   entera */
+.eco > .eco-card:hover { flex-grow: 3.2; }
+/* el rótulo dentro de la foto: la tarjeta se lee como una pieza, no como una
+   imagen con un pie debajo */
+.eco-card {
+  position: relative;
+  overflow: hidden;
+  /* el ancho lo da la columna; la altura se fija sola (un aspect-ratio junto
+     a min-height acaba mandando sobre el ancho y desborda la retícula) */
+  height: clamp(30rem, 72vh, 44rem);
+  border-radius: 4px;
+  color: var(--bone);
+}
+.eco-card .media { position: absolute; inset: 0; aspect-ratio: auto; }
+/* zoom in permanente (Ken Burns): la foto se acerca y se aleja muy despacio,
+   siempre en movimiento — la propiedad scale compone con el transform del
+   parallax sin pisarlo */
+.eco-card .media img { animation: eco-zoom 16s ease-in-out infinite alternate; }
+@keyframes eco-zoom {
+  from { scale: 1; }
+  to { scale: 1.16; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eco-card .media img { animation: none; }
+}
+.eco-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(10, 10, 8, 0.92) 0%,
+              rgba(10, 10, 8, 0.55) 38%, rgba(10, 10, 8, 0.05) 68%, transparent 100%);
+  pointer-events: none;
+}
+.eco-body {
+  position: absolute;
+  z-index: 2;
+  inset: auto 0 0 0;
+  padding: clamp(1.2rem, 2.4vw, 2rem);
+}
+.eco-body h3 {
+  font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+  font-weight: 300;
+  letter-spacing: -0.005em;
+}
+.eco-body .small {
+  margin-top: 0.3rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: 0.58rem;
+  font-weight: 600;
+}
+.eco-body .lede { margin-top: 0.9rem; font-size: 0.85rem; color: rgba(244, 241, 236, 0.82); }
+.eco-body .small { color: rgba(244, 241, 236, 0.6); }
+@media (max-width: 900px) {
+  .eco { flex-direction: column; height: auto; }
+  .ecofs .eco-card { height: clamp(22rem, 55vh, 30rem); }
+  /* en columna la expansión no aplica: crecería en alto */
+  .eco > .eco-card:hover { flex-grow: 1; }
+}
+
+/* ============================================================
+   PREGUNTAS
+   ============================================================ */
+.faq { margin-top: clamp(2.5rem, 6vh, 4rem); border-top: 1px solid var(--line); }
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: clamp(1.1rem, 2.4vh, 1.6rem) 0;
+  font-size: clamp(0.98rem, 1.6vw, 1.2rem);
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  transition: padding-left 0.5s var(--ease);
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: "";
+  flex: none;
+  width: 0.85rem; height: 2px;
+  background: var(--accent);
+  position: relative;
+  transition: transform 0.5s var(--ease);
+}
+.faq-item[open] summary::after { transform: rotate(90deg); }
+.faq-item[open] summary { padding-left: 0.6rem; }
+.faq-item .lede { padding-bottom: 1.6rem; font-size: 0.92rem; max-width: 62ch; }
+
+/* ============================================================
+   SECCIÓN AMARILLA · el momento de marca
+   ============================================================ */
+.gold { color: var(--ink); }
+.gold .lede { color: var(--ink-soft); }
+/* Una sola retícula de dos columnas, repetida fila a fila:
+   cabecera (título / declaración), cuerpo (mockup / copy a la misma
+   altura) y banda de cierre a todo el ancho. Nada queda suelto: cada
+   pieza ocupa una celda y las filas definen el ritmo vertical. */
+.gold-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: clamp(2rem, 6vw, 6rem);
+  row-gap: clamp(2.5rem, 6vh, 4.5rem);
+  align-items: start;
+}
+/* El isotipo es FONDO al lado izquierdo, como en el manifiesto: absoluto,
+   pegado al borde izquierdo del viewport, detrás del titular (en tinta, que
+   es como van las barras sobre amarillo). El texto no se mueve. */
+.gold-title { position: relative; }
+.gold-title .display { position: relative; z-index: 1; }
+.gold-title .sec-mark {
+  position: absolute;
+  left: calc(-1 * ((100vw - min(100vw, var(--maxw))) / 2 + var(--pad)));
+  top: 50%;
+  translate: 0 -50%;
+  margin: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.gold-title .sec-mark svg { width: clamp(9rem, 14vw, 14rem); }
+@media (max-width: 900px) {
+  .gold-title .sec-mark { display: none; }
+}
+.gold-title .display {
+  margin-top: 1.6rem;
+  font-weight: 250;
+  /* subido a petición de Angel (antes 2.2/4.6vw/4.4) */
+  font-size: clamp(2.6rem, 5.8vw, 5.6rem);
+  line-height: 1.05;
+}
+/* la declaración se asienta sobre la misma línea de base que el título */
+.gold-lede {
+  align-self: end;
+  font-size: clamp(1.15rem, 1.9vw, 1.7rem);
+  font-weight: 300;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  max-width: 30ch;
+}
+.gold-copy .lede { font-size: 0.95rem; }
+.gold-copy .lede + .lede { margin-top: 1.6rem; }
+.gold .ticks li { color: var(--ink); }
+.gold .ticks li::before { background: var(--ink); }
+/* El mockup mide lo que mide el copy: la imagen va en absoluto para no
+   imponer su altura natural a la fila (un height:100% aquí es circular y
+   el navegador cae a la altura intrínseca del retrato, kilométrica). */
+/* A sangre por la izquierda: la celda vive dentro del .wrap, así que se le
+   descuenta lo que el wrap la separa del borde — su margen lateral más la
+   mitad del aire que sobra cuando la ventana supera el ancho máximo. El lado
+   derecho no se toca: lo sigue fijando la columna de la rejilla. */
+.gold-shot {
+  position: relative;
+  align-self: stretch;
+  min-height: 30rem;
+  margin-left: calc(-1 * (var(--pad) + max(0px, (100vw - var(--maxw)) / 2)));
+}
+@media (max-width: 900px) {
+  /* en columna el wrap ya no centra: basta con descontar su margen */
+  .gold-shot { margin-left: calc(-1 * var(--pad)); margin-right: calc(-1 * var(--pad)); }
+}
+/* a sangre: ya no vive en la rejilla del .wrap, ocupa la sección entera */
+.gold-band {
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  margin-top: clamp(2.5rem, 7vh, 5rem);
+}
+.gold-shot, .gold-band { background: rgba(20, 19, 15, 0.08); }
+/* parallax de ventana: la foto mide la pantalla y ui.ts la contra-desplaza
+   (--fy = -top del marco), igual que en el carrusel de conceptos */
+.gold-shot img, .gold-band img {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 100vh;
+  transform: translate3d(0, var(--fy, 0px), 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gold-shot img, .gold-band img { height: 100%; transform: none; }
+}
+
+/* marcas aliadas: una línea sobria, sin marco */
+.logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.6rem, 4vw, 4rem);
+  flex-wrap: wrap;
+  padding-block: clamp(2.5rem, 6vh, 4rem);
+  border-block: 1px solid var(--line);
+}
+/* aparición escalonada: cada logo sube y funde por su cuenta al entrar */
+.logos img {
+  height: clamp(1.1rem, 1.9vw, 1.7rem);
+  width: auto;
+  opacity: 0;
+  translate: 0 1.1rem;
+  transition: opacity 0.9s var(--ease), translate 0.9s var(--ease);
+}
+.logos img:nth-of-type(1) { transition-delay: 0.12s; }
+.logos img:nth-of-type(2) { transition-delay: 0.28s; }
+.logos img:nth-of-type(3) { transition-delay: 0.44s; }
+.logos.in img { opacity: 0.55; translate: 0 0; transition-property: opacity, translate; }
+.logos.in img:hover { opacity: 1; transition: opacity 0.4s var(--ease); }
+.logos .small { letter-spacing: 0.3em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) {
+  .logos img { opacity: 0.55; translate: none; transition: none; }
+}
+
+@media (max-width: 900px) {
+  .gold-grid { grid-template-columns: 1fr; row-gap: clamp(2rem, 5vh, 3rem); }
+  .gold-lede { align-self: start; }
+  /* sin fila que lo mida, el mockup vuelve a su proporción propia */
+  .gold-shot { height: auto; min-height: 0; aspect-ratio: 4 / 5; }
+  .gold-band { aspect-ratio: 16 / 10; }
+}
+
+/* ============================================================
+   SELLO DE MARCA sobre las fotos
+   Las imágenes eran sólo imágenes: no decían de quién era el sitio. El sello
+   firma la foto sin taparla — pequeño, en la esquina libre y con la sombra
+   justa para leerse igual sobre un interior claro que sobre uno oscuro.
+   ============================================================ */
+.stamp {
+  position: absolute;
+  z-index: 3;
+  right: clamp(1rem, 2vw, 1.9rem);
+  bottom: clamp(1rem, 2vw, 1.9rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(0.7rem);
+  transition: opacity 0.9s var(--ease) 0.35s, transform 0.9s var(--ease) 0.35s;
+  filter: drop-shadow(0 1px 10px rgba(20, 19, 15, 0.55));
+}
+.stamp svg { width: clamp(0.95rem, 1.5vw, 1.4rem); height: auto; display: block; color: var(--accent); }
+.stamp b {
+  font-weight: 500;
+  font-stretch: 112%;
+  font-size: clamp(0.5rem, 0.7vw, 0.64rem);
+  letter-spacing: 0.34em;
+  color: rgba(244, 241, 236, 0.92);
+}
+/* entra con el propio destape de la foto */
+.media.in .stamp { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .stamp { transition: none; }
+}
+/* en la galería el pie ocupa la esquina izquierda, así que no chocan */
+@media (max-width: 560px) { .stamp b { display: none; } }
+
+/* ============================================================
+   MARCA · las tres barras del isotipo
+   ============================================================ */
+.mark {
+  display: block;
+  width: clamp(1.6rem, 2.4vw, 2.4rem);
+  height: auto;
+  color: var(--ink);
+}
+/* sobre negro las barras van en amarillo; sobre amarillo, en tinta */
+.dark .mark, .cta .mark, .band .mark { color: var(--accent); }
+.mark path, .mark rect { fill: currentColor; }
+/* las barras entran una tras otra, como el propio isotipo se construye */
+.mark rect {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  translate: -0.5rem 0.5rem;
+  transition: opacity 0.7s var(--ease), translate 0.9s var(--ease);
+}
+.mark rect:nth-child(1) { transition-delay: 0.05s; }
+.mark rect:nth-child(2) { transition-delay: 0.18s; }
+.mark rect:nth-child(3) { transition-delay: 0.31s; }
+.in .mark rect, .in.mark rect { opacity: 1; translate: 0 0; }
+.mark-c { display: grid; justify-items: center; }
+/* separador: un filete con el isotipo al centro */
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  margin-block: clamp(3rem, 8vh, 6rem);
+}
+.rule::before, .rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.dark .rule::before, .dark .rule::after,
+.gold .rule::before, .gold .rule::after { background: var(--line-light); }
+.gold .rule::before, .gold .rule::after { background: rgba(20, 19, 15, 0.18); }
+.gold .mark { color: var(--ink); }
+
+/* ============================================================
+   FRANJA DE DISCIPLINAS
+   ============================================================ */
+.strip {
+  background: var(--ink);
+  color: var(--bone);
+  overflow: hidden;
+  padding: 1.1rem 0;
+  border-block: 1px solid var(--line-light);
+}
+.strip p { display: flex; width: max-content; will-change: transform; }
+.strip span {
+  font-size: clamp(0.72rem, 1.1vw, 0.9rem);
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(244, 241, 236, 0.85);
+}
+
+/* ============================================================
+   GALERÍA
+   ============================================================ */
+.gal {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(0.6rem, 1.2vw, 1.2rem);
+  padding-inline: var(--pad);
+  max-width: var(--maxw);
+  margin-inline: auto;
+}
+.gal .media { grid-column: span 4; aspect-ratio: 3 / 4; }
+.gal .media.w { grid-column: span 8; aspect-ratio: 16 / 10; }
+.gal .media.t { margin-top: clamp(2rem, 6vh, 5rem); }
+/* pie dentro de la imagen: antes la galería era muda */
+.gal .media { color: var(--bone); }
+.gal .media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(10, 10, 8, 0.8) 0%,
+              rgba(10, 10, 8, 0.3) 34%, transparent 62%);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+  pointer-events: none;
+}
+.gal .media.in::after { opacity: 1; }
+.gal-cap {
+  position: absolute;
+  z-index: 2;
+  left: clamp(1rem, 2vw, 1.6rem);
+  bottom: clamp(0.9rem, 2vh, 1.4rem);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 236, 0.92);
+}
+@media (max-width: 760px) {
+  .gal .media, .gal .media.w { grid-column: span 12; aspect-ratio: 4 / 3; }
+  .gal .media.t { margin-top: 0; }
+}
+
+/* ============================================================
+   MEMBRESÍAS
+   ============================================================ */
+/* Membresías: titular a una línea, con el isotipo centrado encima.
+   El tamaño va SIN el suelo del clamp general (min con 6rem, no clamp): con el
+   suelo de 2.4rem la frase —27 caracteres, unos 13.5 em— desbordaba en móvil
+   en cuanto se le quita el salto de línea. Así el ancho del texto queda
+   siempre en ~84vw, por debajo del ancho útil en cualquier viewport. */
+#membresias > .sec-mark,
+#membresias > .display { text-align: center; }
+#membresias > .display {
+  white-space: nowrap;
+  font-size: min(6.2vw, 6rem);
+}
+
+/* ---------- coreografía de entrada/salida ----------
+   Cada pieza tiene su propio eje y SIEMPRE va y vuelve por él: el isotipo baja
+   desde arriba, el titular llega desde la izquierda y las tarjetas se alternan
+   abajo-arriba-abajo. Por eso el estado de partida se escribe con :not(.in) y
+   no con .above — así el reposo previo y la salida por arriba comparten regla,
+   y el elemento se retira por donde entró en vez de irse siempre hacia arriba
+   como hace el .rv genérico.
+
+   Y por eso mismo NO se usa un selector con #id sobre .plan sin el :not(.in):
+   ganaría también al :hover y las tarjetas perderían su elevación al pasar el
+   puntero. Con :not(.in) la regla desaparece en cuanto la tarjeta ha entrado. */
+
+/* el isotipo, de arriba hacia abajo */
+#membresias > .sec-mark.rv:not(.in) { transform: translateY(-2.8rem); }
+
+/* el titular, de izquierda a derecha: el bloque entero se desplaza un poco y
+   dentro las palabras entran escalonadas por el mismo lado */
+#membresias > .display.rv:not(.in) { transform: translateX(-1.4rem); }
+#membresias > .display .wd {
+  transform: translateX(-2.6rem);
+  opacity: 0;
+  transition: transform 0.55s var(--ease), opacity 0.45s var(--ease);
+}
+#membresias > .display.in .wd {
+  transform: none;
+  opacity: 1;
+  transition: transform 1.05s var(--ease), opacity 0.7s var(--ease);
+  transition-delay: calc(var(--wi) * 80ms);
+}
+
+/* las tarjetas, alternadas: 1 sube, 2 baja, 3 sube */
+#membresias .plan.rv:not(.in) { transform: translateY(4rem); }
+#membresias .plan.rv:nth-of-type(2):not(.in) { transform: translateY(-4rem); }
+
+@media (prefers-reduced-motion: reduce) {
+  #membresias > .sec-mark.rv:not(.in),
+  #membresias > .display.rv:not(.in),
+  #membresias .plan.rv:not(.in) { transform: none; }
+  #membresias > .display .wd { transform: none; opacity: 1; transition: none; }
+}
+
+.plans {
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.5rem, 0.9vw, 0.9rem);
+}
+.plan {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  padding: clamp(1.8rem, 3vw, 2.8rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  min-height: 35rem;
+  background: var(--ink);
+  color: var(--bone);
+  transition: border-color 0.5s var(--ease), transform 0.6s var(--ease);
+}
+.plan:hover { border-color: var(--accent); transform: translateY(-6px); }
+.plan > :not(.plan-bg) { position: relative; z-index: 1; }
+/* Fotos del club rotando tras el plan, veladas para que el texto mande. */
+.plan-bg { position: absolute; inset: 0; z-index: 0; }
+.plan-bg img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease);
+  /* parallax interno: la escala da recorrido sin descubrir bordes */
+  transform: translate3d(0, var(--py, 0px), 0) scale(1.14);
+  will-change: transform;
+}
+.plan-bg img.on { opacity: 1; }
+.plan-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(20, 19, 15, 0.6) 0%,
+    rgba(20, 19, 15, 0.74) 55%,
+    rgba(20, 19, 15, 0.9) 100%
+  );
+}
+.plan.feat::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--accent);
+  z-index: 2;
+}
+.plan h3 {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.plan .price { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 200; line-height: 1; }
+.plan .price small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: rgba(244, 241, 236, 0.6);
+}
+.plan ul { list-style: none; display: grid; gap: 0.6rem; margin-top: auto; }
+.plan li {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.78rem;
+  font-weight: 300;
+  color: rgba(244, 241, 236, 0.82);
+}
+.plan li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.55em;
+  width: 4px; height: 4px;
+  background: var(--accent);
+}
+.plan.feat { border-color: var(--ink); }
+@media (max-width: 900px) { .plans { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   CTA + PIE
+   ============================================================ */
+.cta {
+  position: relative;
+  background: var(--ink);
+  min-height: 78vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  overflow: hidden;
+  color: var(--bone);
+  background: var(--ink);
+}
+/* el pie mantiene su propio negro: cierra el documento por debajo del lienzo */
+.cta .media { position: absolute; inset: 0; }
+.cta .media img { opacity: 0.5; }
+/* velo: la toma de la entrada es clara y el texto blanco se perdía */
+.cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(120% 90% at 50% 50%,
+              rgba(10, 10, 8, 0.55) 0%, rgba(10, 10, 8, 0.82) 100%);
+  pointer-events: none;
+}
+.cta-inner { position: relative; z-index: 2; padding: var(--pad); }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.4rem;
+  padding: 1.15rem 2.6rem;
+  border: 1px solid var(--bone);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--bone);
+  transition: background-color 0.5s var(--ease), color 0.5s var(--ease),
+              gap 0.5s var(--ease);
+}
+.btn:hover {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent);
+  gap: 1.6rem;
+}
+.btn svg { width: 1.4rem; height: 0.6rem; fill: none; stroke: currentColor; stroke-width: 1.4; }
+
+/* El pie es un cierre, no una segunda portada: una sola banda con la marca,
+   la navegación y los datos en línea. Un tercio del alto que tenía. */
+/* El pie es amarillo pleno para fundirse con la marea que lo precede: sin
+   borde superior, la ola y el pie son una sola superficie. Textos en tinta. */
+.ft {
+  background: var(--accent);
+  color: var(--ink);
+  padding: 2.3rem 0 1.9rem;
+}
+.ft-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1rem, 3vw, 3rem);
+  flex-wrap: wrap;
+}
+.ft-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: inherit;
+  text-decoration: none;
+  flex: none;
+}
+.ft-mark svg { width: 1rem; height: auto; color: var(--ink); }
+.ft-mark b {
+  font-weight: 500;
+  font-stretch: 112%;
+  font-size: 0.8rem;
+  letter-spacing: 0.32em;
+}
+.ft-nav, .ft-meta {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.8rem, 1.8vw, 1.8rem);
+  flex-wrap: wrap;
+}
+.ft-nav a, .ft-meta a {
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: rgba(20, 19, 15, 0.78);
+  text-decoration: none;
+  transition: color 0.35s;
+}
+.ft-nav a { letter-spacing: 0.06em; }
+.ft-meta a { color: rgba(20, 19, 15, 0.58); }
+.ft-nav a:hover, .ft-meta a:hover { color: var(--ink); }
+.ft-fine {
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(20, 19, 15, 0.18);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(20, 19, 15, 0.5);
+}
+@media (max-width: 900px) {
+  .ft-row { justify-content: flex-start; row-gap: 0.9rem; }
+  .ft-meta { width: 100%; }
+}
+
+/* ============================================================
+   CIERRE · marea líquida
+   El fondo blanco con el frente amarillo que sube y va tapando la marca
+   desde abajo. El shader viene de la propuesta 1: es el gesto que Angel
+   validó tras varias vueltas, así que se porta sin tocar.
+   ============================================================ */
+.tide {
+  position: relative;
+  isolation: isolate;
+  background: #fff;
+  min-height: clamp(70vh, 92vh, 56rem);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  /* el logo diferido no debe anclar el scroll y empujar la página */
+  overflow-anchor: none;
+}
+.tide > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+}
+.tide-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: clamp(1.6rem, 4vh, 2.6rem);
+  padding: var(--pad);
+  text-align: center;
+}
+.tide-kicker {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.6;
+}
+/* La marca se queda en su tamaño natural y la marea la va cubriendo: si el
+   logo creciera hasta el borde, el frente pasaría por detrás del recorte y se
+   perdería el efecto de quedar sumergida. */
+.tide-logo {
+  width: min(46rem, 74vw);
+  height: auto;
+}
+/* Entrada del cierre: al llegar al fondo de la web, el logo y el kicker
+   suben desde abajo con RECORRIDO AMPLIO (no el 1.8rem estándar), lentos y
+   escalonados — el kicker abre y la marca lo sigue. */
+.tide-inner .rv {
+  transform: translateY(clamp(6rem, 16vh, 11rem));
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.tide-inner .rv.in {
+  transform: none;
+  transition: opacity 1.7s var(--ease), transform 1.7s var(--ease);
+}
+.tide-kicker.rv.in { transition-delay: 0.1s; opacity: 0.6; }
+.tide-logo.rv.in { transition-delay: 0.35s; }
+@media (max-width: 760px) {
+  .tide { min-height: 62vh; }
+  .tide-logo { width: 86vw; }
+}
+
+/* ============================================================
+   YOU VS YOU · texto cinético sobre amarillo
+   Las bandas se desplazan según su posición en el viewport, no con el reloj:
+   el movimiento lo manda el scroll, como el resto del recorrido.
+   ============================================================ */
+.yvy {
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  padding: clamp(5rem, 12vh, 8rem) 0;
+}
+.yvy-rows {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.yvy-row {
+  transform: translateX(var(--kx, 0));
+  font-weight: 800;
+  font-stretch: 115%;
+  font-size: clamp(2.6rem, 8vw, 7rem);
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  will-change: transform;
+  opacity: 0.92;
+}
+.yvy-row.outline {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--ink);
+  opacity: 0.5;
+}
+/* Recto y sin radios (petición de Angel: antes iba rotado -2° y con 16px).
+   Aparece por fundido puro: de desvanecido a sólido, sin desplazarse. */
+.yvy-center {
+  position: relative;
+  z-index: 4;
+  background: var(--ink);
+  color: #fff;
+  padding: clamp(1.6rem, 4vw, 3rem) clamp(2rem, 5vw, 4rem);
+  font-weight: 760;
+  font-stretch: 112%;
+  font-size: clamp(1.3rem, 3.4vw, 2.6rem);
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+.yvy-center.rv { transform: none; transition: opacity 0.6s var(--ease); }
+.yvy-center.rv.in { transform: none; transition: opacity 1.7s var(--ease) 0.15s; }
+.yvy-center span { color: var(--accent); }
+
+/* ============================================================
+   THE LAB
+   ============================================================ */
+.thelab {
+  background-color: var(--lab-deep);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(5rem, 12vh, 9rem);
+}
+.lab-lines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 5px,
+    rgba(255, 255, 255, 0.05) 5px, rgba(255, 255, 255, 0.05) 6px
+  );
+  mask-image: linear-gradient(180deg, transparent 0%, #000 30%, #000 75%, transparent 100%);
+  pointer-events: none;
+}
+.thelab .wrap { position: relative; z-index: 2; }
+.lab-word {
+  margin-top: 1.6rem;
+  font-weight: 640;
+  font-stretch: 108%;
+  font-size: clamp(4rem, 14vw, 12rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-transform: lowercase;
+}
+.lab-sub {
+  margin-top: 1.2rem;
+  font-size: clamp(0.65rem, 1.4vw, 0.85rem);
+  font-weight: 600;
+  letter-spacing: 0.5em;
+  color: #b9a8d6;
+}
+.lab-copy {
+  margin-top: clamp(2rem, 5vh, 3rem);
+  max-width: 44ch;
+  font-size: 0.98rem;
+  line-height: 1.75;
+  font-weight: 340;
+  color: #cfc3e4;
+}
+.lab-chips { margin-top: clamp(2rem, 5vh, 3rem); display: flex; flex-wrap: wrap; gap: 0.8rem; }
+.chip {
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  padding: 0.85rem 1.3rem;
+  transition: opacity var(--slow) var(--ease), transform 0.35s var(--ease);
+}
+.chip:hover { transform: translateY(-4px) rotate(-2deg); }
+.chip.c2 { background: var(--lab-mid); color: #fff; }
+.chip.c3 { background: #fff; color: var(--lab-deep); }
+.chip.c4 { background: var(--lab-pink); color: #fff; }
+.lab-marquee { position: relative; z-index: 2; margin-top: clamp(3rem, 8vh, 5rem); overflow: hidden; }
+.lab-mrow {
+  transform: translateX(var(--kx, 0));
+  font-weight: 800;
+  font-stretch: 112%;
+  font-size: clamp(2rem, 6vw, 4.6rem);
+  line-height: 1.15;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.55);
+  will-change: transform;
+}
+.lab-mrow.pink { color: var(--lab-pink); -webkit-text-stroke: 0; }
+
+/* ============================================================
+   OASIS
+   ============================================================ */
+.oasis {
+  position: relative;
+  background-color: var(--oasis-indigo);
+  color: #fff;
+  overflow: hidden;
+  padding-block: clamp(5rem, 12vh, 9rem);
+}
+.oasis-aurora {
+  position: absolute;
+  inset: -20%;
+  background-image:
+    radial-gradient(45% 60% at 22% 30%, rgba(224, 101, 58, 0.85) 0%, transparent 60%),
+    radial-gradient(50% 65% at 80% 20%, rgba(227, 25, 127, 0.5) 0%, transparent 65%),
+    radial-gradient(55% 70% at 70% 85%, rgba(31, 127, 131, 0.8) 0%, transparent 60%),
+    radial-gradient(60% 80% at 30% 90%, rgba(44, 58, 140, 0.9) 0%, transparent 70%);
+  /* se funde en los bordes: sin costura con las secciones vecinas */
+  mask-image: linear-gradient(180deg, transparent 8%, #000 28%, #000 72%, transparent 92%);
+  animation: aurora 16s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes aurora {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(4deg) scale(1.12); }
+  100% { transform: rotate(-4deg) scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) { .oasis-aurora { animation: none; } }
+.oasis .wrap { position: relative; z-index: 2; }
+.oasis-vertical {
+  position: absolute;
+  right: 1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.5em;
+  color: rgba(255, 255, 255, 0.75);
+  z-index: 2;
+}
+@media (max-width: 760px) { .oasis-vertical { display: none; } }
+.oasis-word {
+  margin-top: 1.6rem;
+  font-weight: 460;
+  font-stretch: 115%;
+  font-size: clamp(3.4rem, 12.5vw, 11rem);
+  line-height: 1;
+  letter-spacing: 0.18em;
+  margin-right: -0.18em;
+}
+.oasis-sub {
+  margin-top: 0.8rem;
+  font-size: clamp(0.65rem, 1.4vw, 0.85rem);
+  font-weight: 400;
+  letter-spacing: 0.42em;
+  color: rgba(255, 255, 255, 0.85);
+}
+.oasis-sub b { font-weight: 760; letter-spacing: 0.3em; }
+.oasis-list { list-style: none; margin-top: clamp(2.5rem, 6vh, 4rem); }
+.oasis-item {
+  display: grid;
+  grid-template-columns: 3rem 1fr auto;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1.05rem 0.4rem;
+  transition: opacity var(--slow) var(--ease), transform var(--slow) var(--ease),
+              background 0.35s, padding-left 0.35s var(--ease);
+  cursor: default;
+}
+.oasis-item:hover { background: rgba(255, 255, 255, 0.09); padding-left: 1.2rem; }
+.oi-n { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; opacity: 0.7; }
+.oi-t {
+  font-size: clamp(1rem, 2.6vw, 1.7rem);
+  font-weight: 550;
+  font-stretch: 110%;
+  letter-spacing: 0.22em;
+}
+.oi-d { font-size: 0.68rem; font-weight: 400; letter-spacing: 0.14em; opacity: 0.75; text-align: right; }
+@media (max-width: 560px) { .oi-d { display: none; } }
+.oasis-cards {
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  perspective: 900px;
+}
+@media (max-width: 760px) { .oasis-cards { grid-template-columns: 1fr; max-width: 22rem; } }
+.ocard {
+  overflow: hidden;
+  border-radius: 12px;
+  aspect-ratio: 4 / 5;
+  transform-style: preserve-3d;
+  transition: opacity var(--slow) var(--ease), transform 0.25s ease-out, box-shadow 0.4s;
+  will-change: transform;
+}
+.ocard.in { transform: var(--tilt, none); }
+.ocard:hover { box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.55); }
+.ocard img { transform: translate3d(0, var(--py, 0px), 0) scale(1.12); }
+.ocard img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ============================================================
+   CONCEPTOS · carrusel a sangre
+   Las tarjetas se salen por los bordes a propósito: el corte de la última es
+   lo que anuncia que hay más y invita a arrastrar.
+   ============================================================ */
+.cc { padding-block: clamp(6rem, 14vh, 11rem); overflow: hidden; }
+.cc-head { text-align: center; display: grid; justify-items: center; gap: 1.2rem; }
+.cc-head .display { max-width: 18ch; }
+.cc-head .lede { max-width: 58ch; }
+
+.cc-track {
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  display: flex;
+  /* sin separación entre fotos (petición de Angel): una franja continua */
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  /* la primera tarjeta arranca alineada con el texto; el resto sangra */
+  padding-inline: var(--pad) 0;
+  /* Sin esto el encaje ignora el margen inicial: busca el punto más cercano,
+     salta a scrollLeft 93 y mete la primera tarjeta bajo el borde izquierdo. */
+  scroll-padding-inline-start: var(--pad);
+  scrollbar-width: none;
+  cursor: grab;
+}
+.cc-track::-webkit-scrollbar { display: none; }
+.cc-track.drag { cursor: grabbing; scroll-behavior: auto; scroll-snap-type: none; }
+/* mientras deriva sola: sin encaje ni scroll suave, que pelearían con el avance */
+.cc-track.auto { scroll-behavior: auto; scroll-snap-type: none; }
+.cc-track:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+.cc-card {
+  position: relative;
+  flex: 0 0 clamp(15rem, 24vw, 23rem);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  scroll-snap-align: start;
+  color: var(--bone);
+}
+/* la última encaja por su borde derecho: si encajara por el izquierdo como el
+   resto, el recorrido se detendría antes de dejarla ver entera */
+.cc-card:last-child { scroll-snap-align: end; }
+.cc-media { position: absolute; inset: 0; overflow: hidden; }
+/* Sin zoom ni parallax (petición de Angel): la foto entera, quieta en su
+   marco. No reintroducir la ventana 100vh ni el zoom del hover aquí. */
+.cc-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.cc-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(10, 10, 8, 0.94) 0%,
+              rgba(10, 10, 8, 0.6) 34%, rgba(10, 10, 8, 0.08) 64%, transparent 100%);
+  pointer-events: none;
+}
+.cc-body {
+  position: absolute;
+  z-index: 2;
+  inset: auto 0 0 0;
+  padding: clamp(1.2rem, 2vw, 1.8rem);
+}
+.cc-body h3 {
+  font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.cc-body p {
+  margin-top: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: rgba(244, 241, 236, 0.82);
+}
+
+.cc-nav { margin-top: clamp(1.5rem, 4vh, 2.4rem); display: flex; gap: 0.8rem; }
+.cc-arrow {
+  width: 3.4rem;
+  height: 3.4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease),
+              color 0.4s var(--ease), opacity 0.3s;
+}
+.cc-arrow svg { width: 1.4rem; height: 0.6rem; fill: none; stroke: currentColor; stroke-width: 1.4; }
+.cc-arrow:hover { background: var(--accent); border-color: var(--accent); }
+.cc-arrow[disabled] { opacity: 0.28; cursor: default; }
+.cc-arrow[disabled]:hover { background: none; border-color: var(--line); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-track { scroll-behavior: auto; }
+}
+
+/* ============================================================
+   PRECARGADOR
+   Telón en tinta con el isotipo y un contador. Sube como cortina al terminar.
+   La animación de reserva lo retira aunque el script no llegue a ejecutarse:
+   un precargador que depende del JS puede dejar la página tapada para siempre.
+   ============================================================ */
+.pre {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--bone);
+  display: grid;
+  place-items: center;
+  animation: pre-reserva 0s linear 7s forwards;
+}
+/* la palabra y el contador van por encima del lienzo y algo por debajo del
+   centro, para no montarse sobre el isotipo */
+.pre-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: clamp(1rem, 2.5vh, 1.6rem);
+  margin-top: 26vh;
+}
+/* El lienzo cubre la pantalla entera. En una caja pequeña, la embestida final
+   del isotipo se recortaba contra su propio contenedor en cuanto empezaba a
+   crecer: para venirse encima del usuario necesita todo el espacio. */
+.pre-gl {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* La palabra va en DOM y no en GL: así usa la tipografía real de la marca en
+   vez de tener que generar geometría de glifos. La perspectiva del contenedor
+   es la que hace que el giro de cada letra se lea en profundidad. */
+.pre-word {
+  display: flex;
+  perspective: 900px;
+  font-weight: 500;
+  font-stretch: 112%;
+  /* el doble que antes */
+  font-size: clamp(2.8rem, 6.8vw, 5.2rem);
+  letter-spacing: 0.34em;
+  color: var(--bone);
+  margin-left: 0.34em; /* compensa el espaciado del último carácter */
+}
+.pre-l {
+  display: block;
+  font-weight: inherit;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+.pre-num {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(244, 241, 236, 0.55);
+}
+.pre-num::after { content: "%"; }
+/* Salida: ya no sube ningún telón. Las letras se van a la derecha y el
+   isotipo se abalanza sobre la cámara hasta desbordar; para entonces el fondo
+   del precargador ya es blanco, el mismo del hero, así que basta un fundido
+   corto y el corte no se percibe. */
+.pre.done {
+  opacity: 0;
+  transition: opacity 0.4s linear;
+}
+@keyframes pre-reserva { to { opacity: 0; visibility: hidden; } }
+
+/* mientras el telón está puesto, la entrada del hero espera su turno */
+html.cargando { overflow: hidden; }
+html.cargando .hero-media img,
+html.cargando .hero-foot { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pre { display: none; }
+  html.cargando { overflow: auto; }
+}
+
+/* ============================================================
+   ENTRADA EN SECUENCIA, al subir el telón
+   Orden: barras del fondo, la figura desde la derecha, el texto desde la
+   izquierda y, al final, cabecera y pie. Cada grupo arranca antes de que
+   termine el anterior: encadenados se leen como un solo gesto, mientras que
+   uno detrás de otro se sentiría como una lista.
+   ============================================================ */
+/* El hero espera oculto a que suba el telón, pero con plazo: si el bucle se
+   detiene (pestaña en segundo plano, script caído), la animación lo destapa
+   igual a los 6.5 s. Ocultar sin plazo dejaría la página en blanco para
+   siempre — el telón de reserva se levantaría sobre un hero invisible. */
+html.cargando .hero-figure,
+html.cargando .hero-inner,
+html.cargando .hero-foot,
+html.cargando .hd { animation: espera-entrada 6.5s step-end both; }
+
+@keyframes espera-entrada {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+html.entrando .hero-figure { animation: ent-figura 1.35s var(--ease) 0.35s both; }
+html.entrando .hero-inner { animation: ent-texto 1.15s var(--ease) 0.95s both; }
+html.entrando .hero-foot { animation: ent-suave 0.95s var(--ease) 1.6s both; }
+html.entrando .hd { animation: ent-suave 0.95s var(--ease) 1.5s both; }
+
+/* la figura entra desde la derecha, hacia su sitio */
+@keyframes ent-figura {
+  from { opacity: 0; transform: translateX(9%); }
+  to { opacity: 1; transform: none; }
+}
+/* el texto, en sentido contrario: desde la izquierda */
+@keyframes ent-texto {
+  from { opacity: 0; transform: translateX(-2.4rem); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ent-suave {
+  from { opacity: 0; transform: translateY(1rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.entrando .hero-figure,
+  html.entrando .hero-inner,
+  html.entrando .hero-foot,
+  html.entrando .hd { animation: none; opacity: 1; }
+}
+
+/* Terminada la entrada, estas tres propiedades las escribe ui.ts desde el
+   bucle de scroll: la misma secuencia sirve de salida al bajar y de regreso
+   al subir. */
+html.entrada-lista .hero-figure {
+  opacity: var(--eop, 1);
+  transform: translateX(var(--ex, 0));
+}
+html.entrada-lista .hero-inner {
+  opacity: var(--eop, 1);
+  transform: translateX(var(--ex, 0));
+}
+html.entrada-lista .hero-foot {
+  opacity: var(--eop, 1);
+  transform: translateY(var(--ey, 0));
+}
+@media (prefers-reduced-motion: reduce) {
+  html.entrada-lista .hero-figure,
+  html.entrada-lista .hero-inner,
+  html.entrada-lista .hero-foot { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   RECORRIDO VIRTUAL
+   El vídeo va fijo mientras la pista de scroll corre por detrás: lo que
+   avanza no es la página, es el recorrido. El vídeo se reencodificó con
+   todos los fotogramas clave; con la codificación original, saltar a un
+   instante obligaba a decodificar desde el principio y el recorrido iba a
+   tirones.
+   ============================================================ */
+/* ---------- el recorrido vive en un modal a pantalla completa ----------
+   El modal es su propio contenedor de scroll: el recorrido se guía por el
+   scroll, y dentro de una capa fija el de la página ya no sirve. */
+.tourm {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--ink);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.45s var(--ease), visibility 0.45s;
+}
+.tourm.open { opacity: 1; visibility: visible; }
+.tourm[hidden] { display: none; }
+/* botón de cierre, por encima del vídeo */
+.tourm-x {
+  position: fixed;
+  top: clamp(1.2rem, 3vh, 2rem);
+  right: clamp(1.2rem, 3vw, 2.4rem);
+  z-index: 3;
+  width: 2.8rem;
+  height: 2.8rem;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 1px solid rgba(244, 241, 236, 0.35);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+.tourm-x:hover { background: var(--accent); border-color: var(--accent); }
+.tourm-x span {
+  position: absolute;
+  width: 1rem;
+  height: 1.5px;
+  background: var(--bone);
+}
+.tourm-x:hover span { background: var(--ink); }
+.tourm-x span:nth-child(1) { transform: rotate(45deg); }
+.tourm-x span:nth-child(2) { transform: rotate(-45deg); }
+/* con el recorrido abierto, la página de debajo no se mueve */
+html.tour-abierto { overflow: hidden; }
+
+/* segundo botón del cierre, en contorno */
+.btn-alt {
+  background: none;
+  border-color: rgba(244, 241, 236, 0.45);
+  font-family: inherit;
+  cursor: pointer;
+}
+.btn-alt:hover { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+/* Pista larga a propósito: son 16 s de vídeo repartidos en ~7 pantallas de
+   scroll, unas tres veces más que antes. Cuanto más recorrido, más despacio
+   avanza el trayecto por cada vuelta de rueda y más suave se siente. */
+.tour-pista { height: 780vh; }
+.tour-fija {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.tour-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--ink);
+}
+.tour-velo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, rgba(10, 10, 8, 0.82) 0%, rgba(10, 10, 8, 0.25) 34%, transparent 62%),
+    linear-gradient(180deg, rgba(10, 10, 8, 0.55) 0%, transparent 26%);
+  pointer-events: none;
+}
+.tour-hud {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: clamp(2rem, 6vh, 4rem);
+  color: var(--bone);
+}
+.tour-hud .eyebrow { color: rgba(244, 241, 236, 0.72); }
+/* Estaciones del recorrido. Cada una sube desde abajo al llegar su tramo y se
+   retira al pasarlo, apiladas en el mismo sitio: el texto acompaña al trayecto
+   en vez de quedarse fijo sobre un vídeo pegado. */
+.tour-est {
+  list-style: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.tour-e {
+  position: absolute;
+  max-width: min(30rem, 42vw);
+  opacity: var(--o, 0);
+  will-change: transform, opacity;
+  /* Tarjeta amarilla: sobre el vídeo, un texto suelto se pierde en cuanto pasa
+     por una zona clara del recorrido. El bloque de color le da lecho propio y
+     no depende de lo que haya detrás en cada fotograma. */
+  background: var(--accent);
+  color: var(--ink);
+  padding: clamp(1.2rem, 2.2vw, 1.9rem) clamp(1.4rem, 2.6vw, 2.2rem);
+  border-radius: 3px;
+  box-shadow: 0 24px 60px -28px rgba(10, 10, 8, 0.55);
+}
+/* Cada estación en un punto distinto de la pantalla: si todas salieran del
+   mismo sitio, el recorrido se leería como un vídeo con subtítulos. Saltando
+   de esquina en esquina, la mirada acompaña al trayecto.
+   El desplazamiento de la animación (--y) se compone con la colocación de
+   cada una, por eso cada posición reescribe su propio transform. */
+.tour-e[data-pos="ai"] {
+  left: var(--pad);
+  bottom: 26vh;
+  transform: translateY(var(--y, 2.2rem));
+}
+.tour-e[data-pos="ad"] {
+  right: var(--pad);
+  top: 15vh;
+  text-align: right;
+  transform: translateY(var(--y, 2.2rem));
+}
+.tour-e[data-pos="c"] {
+  left: 50%;
+  top: 44%;
+  text-align: center;
+  max-width: min(34rem, 62vw);
+  transform: translate(-50%, calc(-50% + var(--y, 2.2rem)));
+}
+.tour-e[data-pos="bd"] {
+  right: var(--pad);
+  bottom: 26vh;
+  text-align: right;
+  transform: translateY(var(--y, 2.2rem));
+}
+/* en pantalla estrecha no hay sitio para el reparto: todas abajo */
+@media (max-width: 760px) {
+  .tour-e,
+  .tour-e[data-pos="ad"],
+  .tour-e[data-pos="c"],
+  .tour-e[data-pos="bd"] {
+    left: var(--pad);
+    right: var(--pad);
+    top: auto;
+    bottom: 24vh;
+    max-width: none;
+    text-align: left;
+    transform: translateY(var(--y, 2.2rem));
+  }
+}
+.tour-e h3 {
+  font-weight: 300;
+  font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+}
+.tour-e p {
+  margin-top: 0.7rem;
+  font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-e { transition: none; }
+}
+/* barra de avance: dice cuánto queda sin necesidad de explicarlo */
+.tour-barra {
+  margin-top: clamp(1.2rem, 3vh, 2rem);
+  height: 2px;
+  background: rgba(244, 241, 236, 0.22);
+  max-width: 32rem;
+}
+.tour-barra i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+}
+.tour-pista-txt {
+  margin-top: 0.9rem;
+  color: rgba(244, 241, 236, 0.55);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: 0.58rem;
+}
+
+@media (max-width: 900px) { .tour-pista { height: 560vh; } }
+@media (prefers-reduced-motion: reduce) { .tour-pista { height: 100vh; } }
+
+/* ---------- detalles de marca en la sección gris ----------
+   Montado como el brandbook: la palabra en vertical leyéndose de abajo
+   arriba, en tinta sólida y a gran tamaño, con el isotipo amarillo a su
+   izquierda y filetes que dividen la composición en carriles. */
+.bg-gris { position: relative; overflow: hidden; }
+/* el texto cede el carril de la derecha a la marca */
+.bg-gris .split-copy { padding-right: clamp(3rem, 14vw, 14rem); }
+
+.split-vert {
+  position: absolute;
+  right: clamp(1rem, 3vw, 3.2rem);
+  top: 50%;
+  /* vertical-rl escribe hacia abajo; el giro de media vuelta la deja
+     leyéndose de abajo arriba, como en la marca */
+  writing-mode: vertical-rl;
+  transform: translateY(-50%) rotate(180deg);
+  font-weight: 300;
+  font-stretch: 108%;
+  font-size: clamp(3.4rem, 9vw, 9rem);
+  letter-spacing: 0.16em;
+  line-height: 1;
+  color: var(--ink);
+  pointer-events: none;
+  user-select: none;
+}
+/* El DINAMO vertical entra de abajo arriba con recorrido amplio (mismo
+   gesto que Recovery), bidireccional. OJO: sus transforms de reveal deben
+   COMPONER con el translateY(-50%) rotate(180deg) que lo centra y orienta. */
+.split-vert.rv {
+  opacity: 0;
+  transform: translateY(calc(-50% + clamp(5rem, 14vh, 10rem))) rotate(180deg);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.split-vert.rv.in {
+  opacity: 1;
+  transform: translateY(-50%) rotate(180deg);
+  transition: opacity 1.6s var(--ease) 0.15s, transform 1.6s var(--ease) 0.15s;
+}
+.split-vert.rv.above {
+  opacity: 0;
+  transform: translateY(calc(-50% - clamp(5rem, 14vh, 10rem))) rotate(180deg);
+}
+
+.split-iso {
+  position: absolute;
+  right: clamp(7rem, 16vw, 17rem);
+  /* arriba, no centrado: centrado caía justo sobre el párrafo del copy y se
+     traslapaban (el copy vive centrado en vertical) */
+  top: clamp(2.6rem, 9vh, 6rem);
+  width: clamp(3rem, 6.5vw, 6rem);
+  color: var(--accent);
+  pointer-events: none;
+}
+.split-iso svg { width: 100%; height: auto; display: block; }
+/* el isotipo entra escalonado, barra a barra */
+.split-iso rect { opacity: 0; transition: opacity 0.6s var(--ease); }
+.split-iso rect:nth-child(1) { transition-delay: 0.12s; }
+.split-iso rect:nth-child(2) { transition-delay: 0.26s; }
+.split-iso rect:nth-child(3) { transition-delay: 0.4s; }
+.split-iso.in rect { opacity: 1; }
+
+/* filetes verticales: el brandbook divide el plano en carriles */
+.split-carriles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.split-carriles i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(20, 19, 15, 0.16);
+}
+.split-carriles i:nth-child(1) { right: clamp(5.4rem, 12.4vw, 13.2rem); }
+.split-carriles i:nth-child(2) { right: clamp(0.4rem, 1.2vw, 1.2rem); }
+
+@media (max-width: 900px) {
+  /* en columna no hay carril lateral que llenar */
+  .split-vert, .split-iso, .split-carriles { display: none; }
+  .bg-gris .split-copy { padding-right: clamp(2.5rem, 7vw, 7rem); }
+}
+
+/* el isotipo acompaña al titular de marcas propias, a su derecha */
+.ecofs-t {
+  display: flex;
+  /* centrado respecto al bloque del titular, no apoyado en su línea base */
+  align-items: center;
+  gap: clamp(1.2rem, 3vw, 2.8rem);
+  flex-wrap: wrap;
+}
+.ecofs-iso {
+  display: block;
+  width: clamp(3.6rem, 7.4vw, 7.2rem);
+  color: var(--accent);
+}
+.ecofs-iso svg { width: 100%; height: auto; display: block; }
+/* las barras entran una tras otra, con el propio destape del bloque */
+.ecofs-iso rect { opacity: 0; transition: opacity 0.55s var(--ease); }
+.ecofs-iso rect:nth-child(1) { transition-delay: 0.14s; }
+.ecofs-iso rect:nth-child(2) { transition-delay: 0.28s; }
+.ecofs-iso rect:nth-child(3) { transition-delay: 0.42s; }
+.ecofs-iso.in rect { opacity: 1; }
+
+/* isotipo en la esquina de la banda de cierre del bloque amarillo */
+.gold-band-iso {
+  position: absolute;
+  z-index: 2;
+  left: clamp(1.4rem, 3.4vw, 3.6rem);
+  top: clamp(1.4rem, 3.4vh, 3.2rem);
+  width: clamp(5.4rem, 11.5vw, 11.5rem);
+  color: var(--ink);
+  /* En tinta, el riesgo se invierte: la esquina de la foto es clara, pero el
+     parallax puede traer una zona oscura. El halo claro las sostiene ahí. */
+  filter: drop-shadow(0 2px 20px rgba(244, 241, 236, 0.45));
+}
+.gold-band-iso svg { width: 100%; height: auto; display: block; }
+/* entran barra a barra con el propio destape de la banda */
+.gold-band-iso rect { opacity: 0; transition: opacity 0.6s var(--ease); }
+.gold-band-iso rect:nth-child(1) { transition-delay: 0.2s; }
+.gold-band-iso rect:nth-child(2) { transition-delay: 0.34s; }
+.gold-band-iso rect:nth-child(3) { transition-delay: 0.48s; }
+.gold-band.in .gold-band-iso rect { opacity: 1; }

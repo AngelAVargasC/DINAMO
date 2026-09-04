@@ -1,0 +1,22 @@
+# Dependencias y salidas de build
+node_modules/
+web/dist/
+web/.astro/
+*.log
+npm-debug.log*
+
+# Material fuente pesado (656 MB, el brandbook solo pesa 61 MB).
+# GitHub rechaza archivos >100 MB y no hace falta para el deploy:
+# todo lo que usa la web ya está optimizado en web/public/.
+brand/
+scrape/
+vault/
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+__MACOSX/
+.env
+.env.*
+.vscode/
+.idea/

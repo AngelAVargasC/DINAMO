@@ -1,0 +1,929 @@
+---
+import "../styles/global.css";
+
+const experiencia = [
+  { n: "01", t: "Entrenamiento", d: "Peso libre, integrado y cardio", img: "/img/site/galeria-1.jpg" },
+  { n: "02", t: "Technogym", d: "Equipamiento de última generación", img: "/img/technogym.jpg" },
+  { n: "03", t: "Biostrength", d: "Fuerza con inteligencia artificial", img: "/img/site/biostrength-tg.jpg" },
+  { n: "04", t: "Alto rendimiento", d: "Programas de progresión medida", img: "/img/rack.jpg" },
+  { n: "05", t: "Contorno Pilates", d: "Reformer en la terraza acristalada", img: "/img/site/pilates-tg.jpg" },
+  { n: "06", t: "Recovery", d: "Sauna y cámara hiperbárica", img: "/img/site/sauna-camara-tg.jpg" },
+  { n: "07", t: "Nutrición", d: "Acompañamiento y medición", img: "/img/lounge.jpg" },
+  { n: "08", t: "Coworking", d: "Tu jornada, dentro del club", img: "/img/site/coworking-tg.jpg" },
+];
+
+const conceptos = [
+  { t: "Peso libre", d: "Racks, mancuernas y platos olímpicos repartidos en tres plantas.", img: "/img/peso-libre.jpg" },
+  { t: "Technogym", d: "La línea completa, con login en cada aparato y registro de cada serie.", img: "/img/technogym.jpg" },
+  { t: "Biostrength", d: "Fuerza con carga que se ajusta a tu nivel real en cada repetición.", img: "/img/site/biostrength-tg.jpg" },
+  { t: "Alto rendimiento", d: "Programas de progresión medida para quien entrena con objetivo.", img: "/img/rack.jpg" },
+  { t: "Contorno Pilates", d: "Reformer y trabajo de suelo en la terraza acristalada.", img: "/img/site/pilates-tg.jpg" },
+  { t: "Recovery", d: "Sauna, cámara hiperbárica y masaje de descarga en Oasis.", img: "/img/site/sauna-camara-tg.jpg" },
+  { t: "Nutrición", d: "Acompañamiento y medición, con the lab a pie de sala.", img: "/img/lounge.jpg" },
+  { t: "Coworking", d: "Tu jornada entera dentro del club, con Latte Latte al lado.", img: "/img/site/coworking-tg.jpg" },
+];
+
+/* Universo flotante: TODO el pool de fotos, repartido en 3D con un hash
+   determinista (mismo cielo en cada build; nada de Math.random en runtime). */
+const uniFotos = [
+  "recepcion","escaleras","lamparas","cardio","cardio-sala","maquinas","peso-libre","rack","funcional","technogym",
+  "gym-wide","vestidores","lockers","tocador","lavabos","sauna","sauna-detalle","spa","terraza","coworking",
+  "lounge","sala-privada","trainer","biostrength","barbell-setup","fachada-noche","fachada-entrada","walk-light","gym-dark","portrait",
+  "training","deadlift","sprint","grip","chalk-hands","situps","situps2","medball","scream","runners",
+  "rope-back","rope-jump","chalk-plate","battle-ropes","pilates",
+].map((n, i) => {
+  const r = (k: number) => {
+    const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
+    return s - Math.floor(s);
+  };
+  return {
+    // versión ligera: la nube las muestra pequeñas y a resolución completa
+    // eran 11 MB de textura para tarjetas de trescientos píxeles
+    src: `/img/uni/${n.split("/").pop()}.jpg`,
+    x: (3 + r(1) * 88).toFixed(1),
+    y: (6 + r(2) * 78).toFixed(1),
+    z: -(120 + r(3) * 2300).toFixed(0),
+    w: (9 + r(4) * 9).toFixed(1),
+    b: (6 + r(5) * 6).toFixed(1),
+    a: r(6) > 0.55 ? "3 / 4" : "4 / 3",
+  };
+});
+
+const oasisServicios = [
+  { n: "01", t: "CONTRASTES", d: "Cold plunge · Sauna" },
+  { n: "02", t: "MASAJES", d: "Descarga y recuperación" },
+  { n: "03", t: "CÁMARA HIPERBÁRICA", d: "Oxigenación profunda" },
+  { n: "04", t: "LONGEVITY", d: "Protocolos de largo plazo" },
+  { n: "05", t: "TERAPIA DE COMPRESIÓN", d: "Circulación y drenaje" },
+];
+
+const iso = `<svg viewBox="0 0 1346 1152" aria-hidden="true"><g fill="currentColor"><rect x="2180" y="1339.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2563.5 1416)"/><rect x="2832" y="1588.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 3215.5 1665)"/><rect x="2137.4" y="1839.8" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2521 1916.5)"/></g></svg>`;
+
+const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>`;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DINAMO — Gym &amp; Active Hub · Polanco</title>
+    <meta
+      name="description"
+      content="DINAMO. Un santuario contemporáneo del bienestar en Polanco: entrenamiento de alto rendimiento con Technogym, recovery, pilates y coworking. Energía activa que transforma."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/AcuminVariableConcept.otf" as="font" type="font/otf" crossorigin />
+  </head>
+
+  <body>
+    <!-- precargador: se retira solo aunque el script falle, para no dejar
+         la página tapada nunca -->
+    <div class="pre" id="pre" aria-hidden="true">
+      <canvas id="preGl" class="pre-gl"></canvas>
+      <div class="pre-inner">
+        <p class="pre-word" id="preWord" aria-hidden="true"><b class="pre-l" style="--li:0">D</b><b class="pre-l" style="--li:1">I</b><b class="pre-l" style="--li:2">N</b><b class="pre-l" style="--li:3">A</b><b class="pre-l" style="--li:4">M</b><b class="pre-l" style="--li:5">O</b></p>
+      </div>
+    </div>
+
+    <header class="hd" id="hd">
+      <button class="hd-burger" id="hdBurger" type="button"
+              aria-controls="menu" aria-expanded="false" aria-label="Abrir el menú">
+        <span></span><span></span>
+      </button>
+
+      <a class="hd-logo" href="#top" aria-label="DINAMO — inicio">
+        <Fragment set:html={iso} />
+        <b>DINAMO</b>
+      </a>
+
+      <a class="hd-cta" href="#contacto" data-magnet>Agenda tu visita</a>
+    </header>
+
+    <!-- menú a pantalla completa -->
+    <div class="menu" id="menu" aria-hidden="true">
+      <nav class="menu-nav" aria-label="Secciones">
+        <a href="#club" data-sec="club" style="--i:0"><i>El club</i></a>
+        <a href="#experiencia" data-sec="experiencia" style="--i:1"><i>Experiencia</i></a>
+        <a href="#conceptos" data-sec="conceptos" style="--i:2"><i>Conceptos</i></a>
+        <a href="#espacio" data-sec="espacio" style="--i:3"><i>El espacio</i></a>
+        <a href="#recovery" data-sec="recovery" style="--i:4"><i>Recovery</i></a>
+        <a href="#journey" data-sec="journey" style="--i:5"><i>La app</i></a>
+        <a href="#ecosistema" data-sec="ecosistema" style="--i:6"><i>Ecosistema</i></a>
+        <a href="#membresias" data-sec="membresias" style="--i:7"><i>Membresías</i></a>
+        <a href="#thelab" data-sec="thelab" style="--i:8"><i>the lab</i></a>
+        <a href="#oasis" data-sec="oasis" style="--i:9"><i>OASIS</i></a>
+      </nav>
+
+      <div class="menu-foot">
+        <div>
+          <h5>Visítanos</h5>
+          <a href="https://maps.app.goo.gl/v3Rkb4XRLqAzPhHC7" target="_blank" rel="noopener">Anatole France 146<br />Polanco · CDMX</a>
+        </div>
+        <div>
+          <h5>Contacto</h5>
+          <a href="tel:+525528963255">55 2896 3255</a>
+          <a href="mailto:hola@dinamo.fit">hola@dinamo.fit</a>
+        </div>
+        <div>
+          <h5>Síguenos</h5>
+          <a href="https://instagram.com/dinamo_mexico" target="_blank" rel="noopener">@dinamo_mexico</a>
+        </div>
+      </div>
+    </div>
+
+    <main id="top">
+      <!-- ═══════ HERO ═══════ -->
+      <section class="sec hero" id="hero" data-theme="light">
+        <div class="hero-bg" aria-hidden="true">
+          <canvas id="heroGl" class="hero-gl"></canvas>
+          <span class="hb hb-iso" data-depth="1.6"><Fragment set:html={iso} /></span>
+          <span class="hb hb-rules" data-depth="1"></span>
+          <span class="hb hb-floor"></span>
+        </div>
+        <div class="hero-figure" data-depth="0.35" aria-hidden="true">
+          <img src="/img/site/atleta-light.png" alt="" fetchpriority="high" />
+        </div>
+
+        <div class="hero-inner">
+          <h1 class="hero-claim rv" data-lines style="--d:1">
+            Active energy<br />that <em>transforms</em>.
+          </h1>
+          <div class="hero-foot">
+            <p class="small">
+              A contemporary sanctuary for wellbeing.<br />
+              Training, recovery and community under one roof.
+            </p>
+            <a class="hero-scroll" href="#club"><i></i><span>Discover</span></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ MANIFIESTO ═══════ -->
+      <section class="sec manifest pad-y wrap bg-bone" id="club" data-theme="light">
+        <div class="manifest-head">
+          <h2 class="display rv" data-lines style="--d:1">
+            Redefinimos el estándar<br />del <em>fitness</em> tradicional.
+          </h2>
+          <div class="sec-mark rv" style="--d:2"><Fragment set:html={iso} /></div>
+        </div>
+        <div class="manifest-grid">
+          <p class="lede rv" style="--d:2">
+            Equipos y tecnología de vanguardia, entrenadores altamente
+            especializados y un enfoque holístico que abarca desde el alto
+            rendimiento hasta prácticas de equilibrio. Arquitectura de líneas
+            limpias, materiales nobles y una atmósfera cuidadosamente curada:
+            cada visita es una experiencia estética y sensorial.
+          </p>
+          <div class="manifest-figures rv" style="--d:3">
+            <div class="figure">
+              <b data-count="3">3</b>
+              <span>Pisos</span>
+            </div>
+            <div class="figure">
+              <b data-count="40" data-prefix="+">+40</b>
+              <span>Clases / semana</span>
+            </div>
+            <div class="figure">
+              <b>24/7</b>
+              <span>Acceso</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- collage en cruz: interiores a distintas profundidades -->
+        <div class="cross" aria-label="Interiores del club">
+          <div class="cross-t t1 media rv-img" data-depth="0.22"><img src="/img/recepcion.jpg" alt="Recepción" loading="lazy" /></div>
+          <div class="cross-t t2 media rv-img" data-depth="0.26" style="--d:1"><img src="/img/maquinas.jpg" alt="Sala de peso integrado" loading="lazy" /></div>
+          <div class="cross-t t3 media rv-img" data-depth="0.5" style="--d:2"><img src="/img/lamparas.jpg" alt="Lámparas de la recepción" loading="lazy" /></div>
+          <div class="cross-t t4 media rv-img" data-depth="0.1" style="--d:1"><img src="/img/terraza.jpg" alt="Terraza acristalada" loading="lazy" /></div>
+          <div class="cross-t t5 media rv-img" data-depth="0.26" style="--d:2"><img src="/img/cardio-sala.jpg" alt="Sala de cardio" loading="lazy" /></div>
+          <div class="cross-t t6 media rv-img" data-depth="0.5" style="--d:3"><img src="/img/spa.jpg" alt="Spa" loading="lazy" /></div>
+          <div class="cross-t t7 media rv-img" data-depth="0.22" style="--d:2"><img src="/img/vestidores.jpg" alt="Vestidores" loading="lazy" /></div>
+          <div class="cross-t t8 media rv-img" data-depth="0.45" style="--d:3"><img src="/img/funcional.jpg" alt="Zona funcional" loading="lazy" /></div>
+        </div>
+      </section>
+
+      <div class="bg-bone"><div class="wrap"><div class="rule rv"><svg class="mark" viewBox="0 0 1346 1152" aria-hidden="true"><rect x="2180" y="1339.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2563.5 1416)"/><rect x="2832" y="1588.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 3215.5 1665)"/><rect x="2137.4" y="1839.8" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2521 1916.5)"/></svg></div></div></div>
+
+      <!-- ═══════ BANDA · RECEPCIÓN ═══════ -->
+      <section class="sec band band-light" data-theme="dark">
+        <div class="media still rv-img" data-rv="wipel" style="--pos: 50% 62%">
+          <img src="/img/escaleras.jpg" alt="Recepción y escalera principal de DINAMO" loading="lazy" />
+          <Fragment set:html={stamp} />
+          </div>
+        <div class="band-cap">
+          <h3 class="rv">La llegada marca el tono<br />de todo lo que sigue.</h3>
+          <p class="small rv" style="--d:1">Recepción · Anatole France 146</p>
+        </div>
+      </section>
+
+      <!-- ═══════ FRANJA DE DISCIPLINAS ═══════ -->
+      <div class="strip" aria-hidden="true">
+        <p>
+          <span>Peso libre — Peso integrado — Cardio — Alto rendimiento — Pilates — Recovery — Nutrición — Coworking — </span>
+          <span>Peso libre — Peso integrado — Cardio — Alto rendimiento — Pilates — Recovery — Nutrición — Coworking — </span>
+        </p>
+      </div>
+
+      <!-- ═══════ YOU VS YOU ═══════ -->
+      <section class="sec creed dark bg-ink" data-theme="dark">
+        <div class="creed-media rv-img" data-rv="wiper" data-par="0.14" aria-hidden="true">
+          <img src="/img/site/que-es-dinamo.jpg" alt="" loading="lazy" />
+        </div>
+        <div class="wrap creed-inner">
+          <div class="sec-mark rv"><Fragment set:html={iso} /></div>
+          <p class="creed-line rv" data-lines style="--d:1">
+            La única competencia<br />eres <em>tú</em>.
+          </p>
+          <p class="creed-tag rv" style="--d:2">You&nbsp;vs&nbsp;You</p>
+        </div>
+      </section>
+
+      <!-- ═══════ EXPERIENCIA ═══════ -->
+      <section class="sec exp pad-y bg-bone" id="experiencia" data-theme="light">
+        <!-- isotipo grandote de fondo, esquina superior derecha -->
+        <div class="exp-bgmark rv" aria-hidden="true" data-par="0.12"><Fragment set:html={iso} /></div>
+        <div class="wrap">
+          <div class="exp-head">
+            <div>
+              <h2 class="display rv" data-lines style="--d:1">Todo lo que necesitas,<br />bajo un mismo techo.</h2>
+            </div>
+            <p class="small rv" style="--d:2">Ocho disciplinas.<br />Un solo lugar.</p>
+          </div>
+
+          <div class="exp-body">
+            <ul class="exp-list">
+              {experiencia.map((e, i) => (
+                <li class={`exp-item rv ${i === 0 ? "on" : ""}`} style={`--d:${i}`} data-exp={i}>
+                  <button type="button">
+                    <span class="exp-n">{e.n}</span>
+                    <span class="exp-t">{e.t}</span>
+                    <span class="exp-d">{e.d}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <figure class="exp-viewer" id="expViewer">
+              {experiencia.map((e, i) => (
+                <img src={e.img} alt={e.t} class={i === 0 ? "on" : ""} loading="lazy" />
+              ))}
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ TECHNOGYM ═══════ -->
+      <section class="sec split bg-bone" data-theme="light">
+        <div class="media rv-img" data-par="0.1">
+          <img src="/img/maquinas.jpg" alt="Sala de máquinas Technogym" loading="lazy" />
+          <Fragment set:html={stamp} />
+          </div>
+        <div class="split-copy">
+          <h2 class="display rv" data-lines style="--d:1">Technogym.<br />El estándar del <em>alto rendimiento</em>.</h2>
+          <p class="lede rv" style="--d:2">
+            Cada pieza del equipamiento está seleccionada para medir, ajustar y
+            acelerar tu progreso. Biostrength adapta la carga a tu fuerza real
+            en cada repetición, y la app de DINAMO conserva el registro de todo
+            tu recorrido.
+          </p>
+        </div>
+      </section>
+
+      <!-- ═══════ UN DÍA ═══════ -->
+      <section class="sec pad-y wrap bg-bone" data-theme="light">
+        <h2 class="display rv" data-lines style="--d:1">Entrena. Recupérate.<br /><em>Conecta</em>.</h2>
+        <div class="day-grid">
+        <ol class="day">
+          <li class="day-row rv" data-rv="left">
+            <span class="day-h">06:00</span>
+            <span class="day-t">Primer turno</span>
+            <span class="day-d">Fuerza, alto rendimiento o tu clase de la mañana</span>
+          </li>
+          <li class="day-row rv" data-rv="left" style="--d:1">
+            <span class="day-h">07:30</span>
+            <span class="day-t">The Lab</span>
+            <span class="day-d">Shake post-entreno formulado al gramo</span>
+          </li>
+          <li class="day-row rv" data-rv="left" style="--d:2">
+            <span class="day-h">10:00</span>
+            <span class="day-t">Coworking</span>
+            <span class="day-d">Tu jornada sin salir del club, con Latte Latte al lado</span>
+          </li>
+          <li class="day-row rv" data-rv="left" style="--d:3">
+            <span class="day-h">19:00</span>
+            <span class="day-t">Oasis</span>
+            <span class="day-d">Sauna, cámara hiperbárica o masaje de descarga</span>
+          </li>
+          <li class="day-row rv" data-rv="left" style="--d:4">
+            <span class="day-h">21:00</span>
+            <span class="day-t">Comunidad</span>
+            <span class="day-d">Gente que comparte tu nivel de exigencia</span>
+          </li>
+        </ol>
+        <!-- marco fijo: la foto de cada fila se despliega aquí al pasar el cursor -->
+        <div class="day-peek rv-img" aria-hidden="true">
+          <img src="/img/peso-libre.jpg" alt="" loading="lazy" />
+          <img src="/img/lounge.jpg" alt="" loading="lazy" />
+          <img src="/img/coworking.jpg" alt="" loading="lazy" />
+          <img src="/img/sauna.jpg" alt="" loading="lazy" />
+          <img src="/img/terraza.jpg" alt="" loading="lazy" />
+        </div>
+        </div>
+      </section>
+
+      <!-- ═══════ CONCEPTOS · carrusel a sangre ═══════ -->
+      <section class="sec cc bg-bone" id="conceptos" data-theme="light">
+        <div class="wrap cc-head">
+          <h2 class="display rv" data-lines style="--d:1">Ocho formas<br />de entrenar <em>aquí</em>.</h2>
+          <p class="lede rv" style="--d:2">
+            Del peso libre al pilates, del alto rendimiento a la recuperación:
+            cada disciplina tiene su espacio, su equipamiento y su equipo. Esto
+            es lo que encuentras dentro del club.
+          </p>
+        </div>
+
+        <div class="cc-track" id="ccTrack" tabindex="0" role="group" aria-label="Conceptos del club">
+          {conceptos.map((c, i) => (
+            <article class="cc-card rv" data-rv="scale" style={`--d:${Math.min(i, 3)}`}>
+              <div class="cc-media">
+                <img src={c.img} alt={c.t} loading="lazy" draggable="false" />
+              </div>
+              <div class="cc-body">
+                <h3>{c.t}</h3>
+                <p>{c.d}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div class="wrap cc-nav">
+          <button class="cc-arrow" type="button" data-cc="-1" aria-label="Conceptos anteriores">
+            <svg viewBox="0 0 32 12" aria-hidden="true"><path d="M32 6H3M8 1.5 2.5 6 8 10.5" /></svg>
+          </button>
+          <button class="cc-arrow" type="button" data-cc="1" aria-label="Conceptos siguientes">
+            <svg viewBox="0 0 32 12" aria-hidden="true"><path d="M0 6h29M24 1.5 29.5 6 24 10.5" /></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ═══════ EL ESPACIO ═══════ -->
+      <section class="sec pad-y bg-bone" id="espacio" data-theme="light">
+        <div class="wrap">
+          <h2 class="display rv" data-lines style="--d:1">Arquitectura que <em>inspira</em>.</h2>
+        </div>
+        <div class="gal" style="margin-top: clamp(2.5rem, 6vh, 4rem)">
+          <div class="media w rv-img" data-par="0.08">
+            <img src="/img/cardio.jpg" alt="Zona de cardio con vista" loading="lazy" />
+            <figcaption class="gal-cap">Cardio</figcaption>
+            <Fragment set:html={stamp} />
+          </div>
+          <div class="media t rv-img" data-par="0.12" style="--d:1">
+            <img src="/img/sala-privada.jpg" alt="Sala privada de entrenamiento" loading="lazy" />
+            <figcaption class="gal-cap">Sala privada</figcaption>
+          </div>
+          <div class="media t rv-img" data-par="0.1">
+            <img src="/img/lamparas.jpg" alt="Doble altura con lámparas colgantes" loading="lazy" />
+            <figcaption class="gal-cap">Doble altura</figcaption>
+          </div>
+          <div class="media w rv-img" data-par="0.08" style="--d:1">
+            <img src="/img/site/espacio-6.jpg" alt="Terraza acristalada para clases" loading="lazy" />
+            <figcaption class="gal-cap">Terraza</figcaption>
+          </div>
+          <div class="media w rv-img" data-par="0.09">
+            <img src="/img/site/espacio-8.jpg" alt="Recepción bajo la doble altura" loading="lazy" />
+            <figcaption class="gal-cap">Recepción</figcaption>
+          </div>
+          <div class="media t rv-img" data-par="0.12" style="--d:1">
+            <img src="/img/site/espacio-3.jpg" alt="Zona de peso integrado" loading="lazy" />
+            <figcaption class="gal-cap">Peso integrado</figcaption>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ UNIVERSO · todas las fotos flotando en 3D ═══════ -->
+      <section class="sec uni bg-bone" id="universo" data-theme="dark">
+        <div class="uni-stage">
+          <div class="uni-dark" aria-hidden="true"></div>
+          <div class="uni-cloud" id="uniCloud">
+            {uniFotos.map((f) => (
+              <figure class="uni-it" style={`--ux:${f.x}vw; --uy:${f.y}vh; --uz:${f.z}px; --uw:${f.w}rem; --ub:${f.b}s; --ua:${f.a}`}>
+                <img src={f.src} alt="" loading="lazy" />
+              </figure>
+            ))}
+          </div>
+          <div class="uni-veil" aria-hidden="true"></div>
+          <div class="uni-copy">
+            <p class="uni-k">El universo DINAMO</p>
+            <p class="uni-line">Todo lo que somos,<br />a tu <em>alrededor</em>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ PILATES ═══════ -->
+      <section class="sec split rev bg-bone" data-theme="light">
+        <div class="media rv-img" data-par="0.1">
+          <img src="/img/terraza.jpg" alt="Contorno Pilates: el estudio acristalado sobre la ciudad" loading="lazy" />
+          <Fragment set:html={stamp} />
+          </div>
+        <div class="split-copy">
+          <h2 class="display rv" data-lines style="--d:1">Equilibrio<br />bajo la luz.</h2>
+          <p class="lede rv" style="--d:2">
+            Un estudio acristalado sobre la ciudad, con reformers y grupos
+            reducidos. El contrapeso perfecto a las sesiones de fuerza:
+            movilidad, control y respiración.
+          </p>
+        </div>
+      </section>
+
+      <!-- ═══════ RECOVERY ═══════ -->
+      <section class="sec dark pad-y bg-ink" id="recovery" data-theme="dark">
+        <div class="wrap">
+          <div class="sec-mark rv"><Fragment set:html={iso} /></div>
+          <h2 class="display rv" data-lines style="--d:1">El descanso también<br />es <em>entrenamiento</em>.</h2>
+
+          <div class="rec-grid">
+            <div class="media rec-a rv-img" data-rv="wipel" data-par="0.1">
+              <img src="/img/sauna.jpg" alt="Sauna de madera" loading="lazy" />
+              <Fragment set:html={stamp} />
+          </div>
+            <!-- el logo llena el hueco sobre la imagen derecha -->
+            <div class="rec-logo rv" style="--d:2" aria-hidden="true">
+              <img src="/img/logo-blanco.png" alt="" loading="lazy" />
+            </div>
+            <div class="media rec-b rv-img" data-par="0.08" style="--d:1">
+              <img src="/img/spa.jpg" alt="Zona de spa y recuperación" loading="lazy" />
+            </div>
+
+            <div class="rec-list">
+              <div class="rv">
+                <h4>Sauna</h4>
+                <p class="small">Calor seco para descarga muscular</p>
+              </div>
+              <div class="rv" style="--d:1">
+                <h4>Cámara hiperbárica</h4>
+                <p class="small">Oxigenación profunda y recuperación</p>
+              </div>
+              <div class="rv" style="--d:2">
+                <h4>Masaje</h4>
+                <p class="small">Terapia manual y drenaje</p>
+              </div>
+              <div class="rv" style="--d:3">
+                <h4>Longevity</h4>
+                <p class="small">Protocolos de largo plazo</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ VESTIDORES ═══════ -->
+      <section class="sec band" data-theme="dark">
+        <div class="media rv-img" data-rv="wiper" data-fix style="--pos: 50% 58%">
+          <img src="/img/vestidores.jpg" alt="Vestidores de madera con lockers" loading="lazy" />
+          <Fragment set:html={stamp} />
+          </div>
+        <div class="band-cap">
+          <h3 class="rv">Los detalles que no se ven<br />son los que se sienten.</h3>
+          <p class="small rv" style="--d:1">Vestidores · Amenidades · Tocador</p>
+        </div>
+      </section>
+
+      <!-- ═══════ COWORKING ═══════ -->
+      <section class="sec split bg-gris" data-theme="light">
+        <span class="split-carriles" aria-hidden="true"><i></i><i></i></span>
+        <span class="split-vert rv" aria-hidden="true">DINAMO</span>
+        <span class="split-iso rv" aria-hidden="true"><Fragment set:html={iso} /></span>
+        <div class="media rv-img" data-par="0.1">
+          <img src="/img/coworking.jpg" alt="Zona de coworking del club" loading="lazy" />
+          <Fragment set:html={stamp} />
+          </div>
+        <div class="split-copy">
+          <h2 class="display rv" data-lines style="--d:1">Tu día entero,<br />dentro del club.</h2>
+          <p class="lede rv" style="--d:2">
+            Coworking, café y una comunidad que comparte tu nivel de exigencia.
+            Entrena por la mañana, trabaja al mediodía y recupérate por la
+            tarde sin salir del edificio.
+          </p>
+        </div>
+      </section>
+
+      <!-- ═══════ THE JOURNEY · amarillo pleno ═══════ -->
+      <section class="sec gold pad-y bg-gold" id="journey" data-theme="gold">
+        <div class="wrap gold-grid">
+          <!-- fila 1 · cabecera: título / declaración, sobre el mismo eje -->
+          <div class="gold-title">
+            <div class="sec-mark rv"><Fragment set:html={iso} /></div>
+            <h2 class="display rv" data-lines style="--d:1">Dinamo:<br />The Journey</h2>
+          </div>
+          <p class="gold-lede rv" style="--d:2">
+            Todo empieza descargando Dinamo App, un potente ecosistema digital
+            que eleva la experiencia de tu transformación.
+          </p>
+
+          <!-- fila 2 · cuerpo: mockup / copy, a la misma altura -->
+          <div class="media gold-shot rv-img" data-fix>
+            <img src="/img/site/journey-app.jpg" alt="Dinamo App: plan, histórico y reservas" loading="lazy" />
+          </div>
+          <div class="gold-copy">
+            <p class="lede rv" style="--d:1">
+              Technogym Checkup es la herramienta más completa para evaluar tu
+              cuerpo y mente. Basándonos en tu «wellness age», este análisis
+              avanzado genera programas de entrenamiento impulsados por
+              inteligencia artificial, diseñados para alcanzar tus objetivos. Ya
+              sea con nuestros coaches certificados o a través del sistema
+              Technogym Coach en Dinamo App, tu camino hacia la transformación
+              está siempre respaldado y personalizado.
+            </p>
+            <p class="lede rv" style="--d:2">
+              Lleva un registro preciso de cada workout haciendo login en los
+              aparatos de Dinamo, y canaliza toda tu energía para lograr tus
+              objetivos.
+            </p>
+            <ul class="ticks rv" style="--d:3">
+              <li>Technogym Checkup y wellness age</li>
+              <li>Programas generados con inteligencia artificial</li>
+              <li>Login en cada aparato, registro de cada workout</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- banda de cierre a sangre: fuera del .wrap, que es quien limitaba el ancho -->
+        <div class="media gold-band rv-img" data-fix>
+          <img src="/img/site/transformacion-tg.jpg" alt="Technogym Checkup y wellness age en la app" loading="lazy" />
+          <span class="gold-band-iso" aria-hidden="true"><Fragment set:html={iso} /></span>
+        </div>
+      </section>
+
+      <!-- ═══════ ECOSISTEMA ═══════ -->
+      <section class="sec ecofs bg-bone" id="ecosistema" data-theme="dark">
+        <!-- el titular vive DENTRO del contenedor de imágenes, sobre ellas -->
+        <div class="ecofs-head">
+          <div class="ecofs-t">
+            <h2 class="display rv" data-lines style="--d:1">Marcas propias<br />dentro del club.</h2>
+            <span class="ecofs-iso rv" style="--d:2" aria-hidden="true"><Fragment set:html={iso} /></span>
+          </div>
+          <p class="small rv" style="--d:2">Nutrición, recuperación<br />y café de especialidad.</p>
+        </div>
+
+          <div class="eco">
+            <article class="eco-card rv" data-rv="scale">
+              <div class="media rv-img" data-par="0.08">
+                <img src="/img/lounge.jpg" alt="The Lab, shake bar de DINAMO" loading="lazy" />
+              </div>
+              <div class="eco-body">
+                <h3>the lab</h3>
+                <p class="small">Shake bar</p>
+                <p class="lede">
+                  Nutrición con método: proteína, recuperación y energía medidas
+                  al gramo para acompañar cada sesión.
+                </p>
+              </div>
+            </article>
+
+            <article class="eco-card rv" data-rv="scale" style="--d:1">
+              <div class="media rv-img" data-par="0.08">
+                <img src="/img/spa.jpg" alt="Oasis, área de wellness de DINAMO" loading="lazy" />
+              </div>
+              <div class="eco-body">
+                <h3>Oasis</h3>
+                <p class="small">Wellness</p>
+                <p class="lede">
+                  Contrastes, masaje, cámara hiperbárica y protocolos de
+                  longevidad. El área donde el cuerpo vuelve a su sitio.
+                </p>
+              </div>
+            </article>
+
+            <article class="eco-card rv" data-rv="scale" style="--d:2">
+              <div class="media rv-img" data-par="0.08">
+                <img src="/img/coworking.jpg" alt="Latte Latte, café dentro del club" loading="lazy" />
+              </div>
+              <div class="eco-body">
+                <h3>Latte Latte</h3>
+                <p class="small">Café de especialidad</p>
+                <p class="lede">
+                  El punto de encuentro del club. Café, mesa de trabajo y la
+                  conversación que empieza después del entrenamiento.
+                </p>
+              </div>
+            </article>
+          </div>
+      </section>
+
+      <div class="bg-bone"><div class="wrap"><div class="rule rv"><svg class="mark" viewBox="0 0 1346 1152" aria-hidden="true"><rect x="2180" y="1339.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2563.5 1416)"/><rect x="2832" y="1588.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 3215.5 1665)"/><rect x="2137.4" y="1839.8" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2521 1916.5)"/></svg></div></div></div>
+
+      <!-- ═══════ MARCAS ALIADAS ═══════ -->
+      <div class="bg-bone">
+        <div class="wrap logos rv">
+          <p class="small">Con</p>
+          <img src="/img/site/technogym-logo.png" alt="Technogym" loading="lazy" />
+          <img src="/img/site/contorno-logo-dark.svg" alt="Contorno Pilates" loading="lazy" />
+          <img src="/img/site/lattelatte-logo-dark.png" alt="Latte Latte" loading="lazy" />
+        </div>
+      </div>
+
+      <!-- ═══════ MEMBRESÍAS ═══════ -->
+      <section class="sec pad-y wrap bg-bone" id="membresias" data-theme="light">
+        <div class="sec-mark rv"><Fragment set:html={iso} /></div>
+        <h2 class="display rv" data-lines style="--d:1">Elige cómo quieres <em>vivirlo</em>.</h2>
+
+        <div class="plans">
+          <article class="plan rv" style="--d:1">
+            <div class="plan-bg" aria-hidden="true" data-par="0.09">
+              <img src="/img/fachada-entrada.jpg" alt="" class="on" loading="lazy" />
+              <img src="/img/cardio.jpg" alt="" loading="lazy" />
+              <img src="/img/peso-libre.jpg" alt="" loading="lazy" />
+              <img src="/img/recepcion.jpg" alt="" loading="lazy" />
+              <img src="/img/maquinas.jpg" alt="" loading="lazy" />
+              <img src="/img/escaleras.jpg" alt="" loading="lazy" />
+              <img src="/img/funcional.jpg" alt="" loading="lazy" />
+              <img src="/img/technogym.jpg" alt="" loading="lazy" />
+              <img src="/img/gym-wide.jpg" alt="" loading="lazy" />
+              <img src="/img/rack.jpg" alt="" loading="lazy" />
+              <img src="/img/cardio-sala.jpg" alt="" loading="lazy" />
+              <img src="/img/lamparas.jpg" alt="" loading="lazy" />
+              <img src="/img/vestidores.jpg" alt="" loading="lazy" />
+              <img src="/img/lockers.jpg" alt="" loading="lazy" />
+              <img src="/img/training.jpg" alt="" loading="lazy" />
+            </div>
+            <h3>Essential</h3>
+            <p class="price">Consultar<small>Acceso libre</small></p>
+            <ul>
+              <li>Acceso a las tres plantas</li>
+              <li>Clases grupales incluidas</li>
+              <li>Vestidores y amenidades</li>
+              <li>App DINAMO</li>
+            </ul>
+          </article>
+
+          <article class="plan feat rv" style="--d:2">
+            <div class="plan-bg" aria-hidden="true" data-par="0.09">
+              <img src="/img/sauna.jpg" alt="" class="on" loading="lazy" />
+              <img src="/img/spa.jpg" alt="" loading="lazy" />
+              <img src="/img/terraza.jpg" alt="" loading="lazy" />
+              <img src="/img/coworking.jpg" alt="" loading="lazy" />
+              <img src="/img/pilates.jpg" alt="" loading="lazy" />
+              <img src="/img/sauna-detalle.jpg" alt="" loading="lazy" />
+              <img src="/img/lounge.jpg" alt="" loading="lazy" />
+              <img src="/img/battle-ropes.jpg" alt="" loading="lazy" />
+              <img src="/img/tocador.jpg" alt="" loading="lazy" />
+              <img src="/img/fachada-noche.jpg" alt="" loading="lazy" />
+              <img src="/img/medball.jpg" alt="" loading="lazy" />
+              <img src="/img/lavabos.jpg" alt="" loading="lazy" />
+              <img src="/img/situps.jpg" alt="" loading="lazy" />
+              <img src="/img/walk-light.jpg" alt="" loading="lazy" />
+              <img src="/img/rope-jump.jpg" alt="" loading="lazy" />
+            </div>
+            <h3>Signature</h3>
+            <p class="price">Consultar<small>La experiencia completa</small></p>
+            <ul>
+              <li>Todo lo de Essential</li>
+              <li>Recovery: sauna e hiperbárica</li>
+              <li>Valoración y plan personalizado</li>
+              <li>Acceso a coworking</li>
+              <li>Invitados al mes</li>
+            </ul>
+          </article>
+
+          <article class="plan rv" style="--d:3">
+            <div class="plan-bg" aria-hidden="true" data-par="0.09">
+              <img src="/img/sala-privada.jpg" alt="" class="on" loading="lazy" />
+              <img src="/img/trainer.jpg" alt="" loading="lazy" />
+              <img src="/img/barbell-setup.jpg" alt="" loading="lazy" />
+              <img src="/img/rope-back.jpg" alt="" loading="lazy" />
+              <img src="/img/biostrength.jpg" alt="" loading="lazy" />
+              <img src="/img/deadlift.jpg" alt="" loading="lazy" />
+              <img src="/img/sprint.jpg" alt="" loading="lazy" />
+              <img src="/img/grip.jpg" alt="" loading="lazy" />
+              <img src="/img/portrait.jpg" alt="" loading="lazy" />
+              <img src="/img/runners.jpg" alt="" loading="lazy" />
+              <img src="/img/chalk-hands.jpg" alt="" loading="lazy" />
+              <img src="/img/gym-dark.jpg" alt="" loading="lazy" />
+              <img src="/img/situps2.jpg" alt="" loading="lazy" />
+              <img src="/img/chalk-plate.jpg" alt="" loading="lazy" />
+              <img src="/img/scream.jpg" alt="" loading="lazy" />
+            </div>
+            <h3>Private</h3>
+            <p class="price">Consultar<small>Uno a uno</small></p>
+            <ul>
+              <li>Entrenamiento personal</li>
+              <li>Seguimiento nutricional</li>
+              <li>Sala privada por sesión</li>
+              <li>Agenda prioritaria</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- ═══════ PREGUNTAS ═══════ -->
+      <section class="sec pad-y wrap bg-bone" data-theme="light">
+        <h2 class="display rv" data-lines style="--d:1">Preguntas<br /><em>frecuentes</em>.</h2>
+        <div class="faq">
+          <details class="faq-item rv">
+            <summary>¿Puedo conocer el club antes de inscribirme?</summary>
+            <p class="lede">
+              Sí. Agenda una visita guiada y recorre las tres plantas con un
+              miembro del equipo, sin compromiso.
+            </p>
+          </details>
+          <details class="faq-item rv" style="--d:1">
+            <summary>¿La valoración inicial está incluida?</summary>
+            <p class="lede">
+              En Signature y Private sí: evaluación física completa, objetivos y
+              un plan diseñado por el equipo multidisciplinario.
+            </p>
+          </details>
+          <details class="faq-item rv" style="--d:2">
+            <summary>¿Qué equipamiento tienen?</summary>
+            <p class="lede">
+              Línea completa Technogym, incluida Biostrength, además de peso
+              libre, cardio y zona funcional repartidos en tres plantas.
+            </p>
+          </details>
+          <details class="faq-item rv" style="--d:3">
+            <summary>¿Hay estacionamiento?</summary>
+            <p class="lede">
+              Contamos con valet parking para miembros en Anatole France 146,
+              en el corazón de Polanco.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <!-- ═══════ YOU VS YOU · cinética sobre amarillo ═══════ -->
+      <section class="sec yvy bg-gold" data-theme="gold">
+        <div class="yvy-rows" aria-hidden="true">
+          <p class="yvy-row" data-dir="1">YOU VS YOU — YOU VS YOU — YOU VS YOU — YOU VS YOU — YOU VS YOU —&nbsp;</p>
+          <p class="yvy-row outline" data-dir="-1">THE TIME IS NOW — THE TIME IS NOW — THE TIME IS NOW — THE TIME IS NOW —&nbsp;</p>
+          <p class="yvy-row" data-dir="1">BUILD YOUR BEST YOU — BUILD YOUR BEST YOU — BUILD YOUR BEST YOU —&nbsp;</p>
+          <p class="yvy-row outline" data-dir="-1">YOU VS YOU — YOU VS YOU — YOU VS YOU — YOU VS YOU — YOU VS YOU —&nbsp;</p>
+        </div>
+        <p class="yvy-center rv">
+          DENTRO DE DINAMO<br />VIVEN <span>DOS MARCAS</span>.
+        </p>
+      </section>
+
+      <!-- ═══════ THE LAB ═══════ -->
+      <section class="sec thelab" id="thelab" data-theme="lab">
+        <div class="lab-lines" aria-hidden="true"></div>
+        <div class="wrap">
+          <h2 class="lab-word rv" style="--d:1">the lab</h2>
+          <p class="lab-sub rv" style="--d:2">SHAKE&nbsp;BAR&nbsp;&nbsp;·&nbsp;&nbsp;BY&nbsp;DINAMO</p>
+          <p class="lab-copy rv" style="--d:3">
+            Nutrición con método. Shakes formulados con precisión de
+            laboratorio para acompañar tu entrenamiento: proteína, recuperación
+            y energía, medidas al gramo.
+          </p>
+          <div class="lab-chips">
+            <span class="chip c2 rv">PROTEÍNA</span>
+            <span class="chip c4 rv" style="--d:1">RECUPERACIÓN</span>
+            <span class="chip c3 rv" style="--d:2">ENERGÍA</span>
+          </div>
+        </div>
+        <div class="lab-marquee" aria-hidden="true">
+          <p class="lab-mrow" data-dir="1">SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;</p>
+          <p class="lab-mrow pink" data-dir="-1">SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;</p>
+        </div>
+      </section>
+
+      <!-- ═══════ OASIS ═══════ -->
+      <section class="sec oasis" id="oasis" data-theme="dark">
+        <div class="oasis-aurora" aria-hidden="true"></div>
+        <p class="oasis-vertical" aria-hidden="true">TRAIN&nbsp;&nbsp;·&nbsp;&nbsp;RECOVER&nbsp;&nbsp;·&nbsp;&nbsp;CONNECT</p>
+        <div class="wrap">
+          <h2 class="oasis-word rv" style="--d:1">OASIS</h2>
+          <p class="oasis-sub rv" style="--d:2">WELLNESS&nbsp;BY&nbsp;&nbsp;<b>DINAMO</b></p>
+          <ul class="oasis-list">
+            {oasisServicios.map((o, i) => (
+              <li class="oasis-item rv" style={`--d:${i}`}>
+                <span class="oi-n">{o.n}</span>
+                <span class="oi-t">{o.t}</span>
+                <span class="oi-d">{o.d}</span>
+              </li>
+            ))}
+          </ul>
+          <div class="oasis-cards">
+            <figure class="ocard rv" data-tilt data-par="0.05"><img src="/img/oasis-contrastes.jpg" alt="Circuito de contrastes: cold plunge y sauna" loading="lazy" /></figure>
+            <figure class="ocard rv" data-tilt data-par="0.05" style="--d:1"><img src="/img/oasis-menu.jpg" alt="Servicios de OASIS" loading="lazy" /></figure>
+            <figure class="ocard rv" data-tilt data-par="0.05" style="--d:2"><img src="/img/oasis-recovery.jpg" alt="Circuito de recovery" loading="lazy" /></figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ CTA ═══════ -->
+      <section class="sec cta" id="contacto" data-theme="dark">
+        <div class="media" data-fix>
+          <img src="/img/fachada-entrada.jpg" alt="" loading="lazy" />
+        </div>
+        <div class="cta-inner">
+          <div class="sec-mark rv"><Fragment set:html={iso} /></div>
+          <h2 class="display rv" data-lines style="--d:1">Conoce el club<br />en <em>persona</em>.</h2>
+          <a class="btn rv" data-magnet style="--d:2" href="mailto:hola@dinamo.fit?subject=Quiero%20agendar%20una%20visita">
+            <span>Agenda tu visita</span>
+            <svg viewBox="0 0 32 12" aria-hidden="true"><path d="M0 6h29M24 1.5 29.5 6 24 10.5" /></svg>
+          </a>
+          <button class="btn btn-alt rv" id="tourOpen" type="button" style="--d:3">
+            <span>Recorrido virtual</span>
+            <svg viewBox="0 0 32 12" aria-hidden="true"><path d="M0 6h29M24 1.5 29.5 6 24 10.5" /></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ═══════ CIERRE · marea líquida ═══════ -->
+      <section class="sec tide" data-theme="light">
+        <canvas id="tideGl" aria-hidden="true"></canvas>
+        <div class="tide-inner">
+          <p class="tide-kicker rv">You vs You</p>
+          <img class="tide-logo rv" src="/img/logo-slogan-iso-amarillo.png"
+               alt="DINAMO — You vs You" loading="lazy" />
+        </div>
+      </section>
+
+      <!-- ═══════ RECORRIDO VIRTUAL · modal ═══════ -->
+      <div class="tourm" id="tourModal" role="dialog" aria-modal="true"
+           aria-label="Recorrido virtual por el club" hidden>
+        <button class="tourm-x" id="tourClose" type="button" aria-label="Cerrar el recorrido">
+          <span></span><span></span>
+        </button>
+  <div class="tour-pista">
+            <div class="tour-fija">
+              <video
+                class="tour-video"
+                id="tourVideo"
+                muted
+                playsinline
+                preload="none"
+                poster="/video/recorrido-poster.jpg"
+                data-src="/video/recorrido.mp4"
+                aria-label="Recorrido por el club, de la entrada a la sala"
+              ></video>
+              <div class="tour-velo" aria-hidden="true"></div>
+              <ol class="tour-est" id="tourEst">
+                <li class="tour-e" data-pos="ai" data-a="0" data-b="0.30">
+                  <h3>La entrada</h3>
+                  <p>Anatole France 146. El tono de la visita empieza en la puerta.</p>
+                </li>
+                <li class="tour-e" data-pos="ad" data-a="0.26" data-b="0.58">
+                  <h3>Recepción</h3>
+                  <p>Doble altura, luz cálida y un equipo que te espera por tu nombre.</p>
+                </li>
+                <li class="tour-e" data-pos="c" data-a="0.54" data-b="0.82">
+                  <h3>El lobby</h3>
+                  <p>Café, mesa de trabajo y la conversación que sigue al entreno.</p>
+                </li>
+                <li class="tour-e" data-pos="bd" data-a="0.78" data-b="1.01">
+                  <h3>La sala</h3>
+                  <p>Technogym de punta a punta, medido en cada repetición.</p>
+                </li>
+              </ol>
+              <div class="tour-hud">
+                <p class="eyebrow">Recorrido virtual</p>
+                <div class="tour-barra" aria-hidden="true"><i id="tourProg"></i></div>
+                <p class="small tour-pista-txt">Desplázate para avanzar</p>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      <!-- ═══════ PIE ═══════ -->
+      <footer class="ft">
+        <div class="wrap">
+          <div class="ft-row">
+            <a class="ft-mark" href="#hero" aria-label="DINAMO — inicio">
+              <Fragment set:html={iso} />
+              <b>DINAMO</b>
+            </a>
+
+            <nav class="ft-nav">
+              <a href="#club">El club</a>
+              <a href="#experiencia">Experiencia</a>
+              <a href="#espacio">El espacio</a>
+              <a href="#recovery">Recovery</a>
+              <a href="#ecosistema">Ecosistema</a>
+              <a href="#membresias">Membresías</a>
+            </nav>
+
+            <div class="ft-meta">
+              <a href="https://maps.app.goo.gl/v3Rkb4XRLqAzPhHC7" target="_blank" rel="noopener">Anatole France 146, Polanco</a>
+              <a href="tel:+525528963255">55 2896 3255</a>
+              <a href="mailto:hola@dinamo.fit">hola@dinamo.fit</a>
+              <a href="https://instagram.com/dinamo_mexico" target="_blank" rel="noopener">@dinamo_mexico</a>
+            </div>
+          </div>
+
+          <div class="ft-fine">
+            <span>© 2026 DINAMO — You vs You</span>
+            <span>Technogym · Contorno Pilates · Latte Latte</span>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      import "../scripts/ui.ts";
+      import "../scripts/hero-gl.ts";
+      import "../scripts/pre-gl.ts";
+      import "../scripts/tide.ts";
+    </script>
+  </body>
+</html>

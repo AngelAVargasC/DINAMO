@@ -1,0 +1,13 @@
+{
+  "name": "dinamo",
+  "private": true,
+  "description": "DINAMO — Gym | Active Hub. Raíz del repo; el sitio vive en web/. Este package.json solo delega a web/ para que Railway despliegue sin configurar Root Directory.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm --prefix web ci && npm --prefix web run build",
+    "start": "npm --prefix web start",
+    "dev": "npm --prefix web run dev"
+  }
+}
