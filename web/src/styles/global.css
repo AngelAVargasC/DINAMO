@@ -522,7 +522,23 @@ html.menu-lock { overflow: hidden; }
   .hb, .hero-figure img { transition: none; }
 }
 @media (max-width: 900px) {
-  .hero-figure { height: 60vh; right: -16vw; opacity: 0.42; }
+  /* Recorte propio para móvil (corredora-mobile.png): sin fondo, el pelo
+     entero. En móvil texto y figura NO se superponen (el titular en tinta
+     sobre el cuerpo negro no se leía): el bloque de texto sube al tercio
+     superior y la corredora ocupa el inferior derecho. */
+  .hero { align-items: start; }
+  /* .hero .hero-inner: la regla base (más abajo en el archivo) usa el
+     shorthand padding y pisaba este padding-top con la misma especificidad */
+  .hero .hero-inner { padding-top: calc(5rem + 3vh); padding-bottom: 0; }
+  /* el pie vuelve al flujo bajo el titular: anclado abajo caería sobre las
+     piernas de la corredora */
+  .hero .hero-foot { position: static; margin-top: 1.4rem; }
+  .hero-figure {
+    height: 56vh;
+    right: -12vw;
+    bottom: -2vh;
+    opacity: 1;
+  }
   .hb-iso { opacity: 0.05; }
 }
 /* Velo claro por la izquierda: el final del titular caía sobre el brazo oscuro

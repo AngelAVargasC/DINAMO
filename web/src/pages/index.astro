@@ -165,7 +165,12 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
           <span class="hb hb-floor"></span>
         </div>
         <div class="hero-figure" data-depth="0.35" aria-hidden="true">
-          <img decoding="async" src="/img/site/atleta-light.png" alt="" fetchpriority="high" />
+          <!-- móvil: recorte con alfa de la corredora nueva (pelo entero, sin el
+               corte recto del recorte de escritorio); escritorio: el de siempre -->
+          <picture>
+            <source media="(max-width: 900px)" srcset="/img/site/corredora-mobile.png" />
+            <img decoding="async" src="/img/site/atleta-light.png" alt="" fetchpriority="high" />
+          </picture>
         </div>
 
         <div class="hero-inner">

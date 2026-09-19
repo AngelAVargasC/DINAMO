@@ -252,6 +252,35 @@ de esta sección; conviene que Angel recorra la página entera en el iPhone.
   izquierda de cada barra se funde a blanco, como en la portada. Entrada por
   opacidad escalonada. Verificado sólo por geometría (pestaña oculta).
 
+**Hero en móvil: la corredora nueva, recortada (Angel).** Angel dejó en
+`brand/` «Corredora en blanco y negro.png» (941×1672, foto completa con
+fondo gris claro y el pelo entero). Primero se probó sin recortar con
+`mix-blend-mode: multiply`; **descartado**: el fondo no es blanco puro sino
+gris (~225) y se veía el rectángulo. Ahora es un recorte con alfa como el de
+escritorio: `public/img/site/corredora-mobile.png` (780×976, 546 KB), hecho
+con **rembg (u2net, alpha matting) + key de luminancia para el pelo** (el
+fondo es uniforme y claro, así que la luminancia separa bien las puntas) +
+relleno de huecos del cuerpo (brillos de piel) + descontaminación del gris
+en los bordes. Script en el scratchpad de esta sesión; la receta está aquí
+por si hay que repetirla. La figura del hero es un `<picture>`: ≤ 900 px
+carga este PNG; escritorio sigue con `atleta-light.png`.
+**Composición móvil (Angel: «el texto se pierde»)**: el titular en tinta caía
+sobre el cuerpo negro. En ≤ 900 px texto y figura ya no se superponen: el
+hero alinea arriba (`align-items: start`), el bloque de texto sube al tercio
+superior (`.hero .hero-inner { padding-top: calc(5rem + 3vh) }`; ojo, con
+`.hero` delante porque la regla base va después en el archivo y su
+shorthand `padding` la pisaba), el pie («Discover») vuelve al flujo bajo el
+titular (`position: static`; anclado abajo caía sobre las piernas) y la
+corredora ocupa el inferior derecho (56 vh, `right: -12vw`, opacidad 1).
+Verificado en marco de 390×750: titular 91–171 px, pie 200–282, figura
+desde 345. Nada se toca.
+  **Ojo con `npm run dev` en OneDrive:** Angel seguía viendo la imagen
+  recortada porque el servidor de desarrollo (4321) sirvió el CSS nuevo
+  (mezcla multiplicar) pero **no** el marcado nuevo del `<picture>`: el
+  vigilante de archivos de Vite perdió el evento de `index.astro`. Un
+  `touch` del archivo lo arregló. Si un cambio de marcado no aparece y los
+  de estilo sí, es esto: reiniciar el dev o volver a guardar el archivo.
+
 **Ideas que quedan si hiciera falta más:** bajar el tope a 1600 px en las
 fotos que nunca van a sangre (las de tarjetas y mitades); `srcset` por
 tamaño; convertir a WebP/AVIF (~30–40 % menos peso, requiere `<picture>`).
