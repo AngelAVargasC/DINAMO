@@ -95,11 +95,27 @@ quedó fuera. Estado: `[x]` hecho · `[ ]` pendiente.
    esquina superior izquierda, sin tapar el titular. Verificado en navegador.
    Reutilizable en cualquier sección `position: relative` con
    `<div class="bars rv" data-rv="bars"><i></i><i></i></div>`.
-6. `[ ]` **Membresías («Elige cómo quieres vivirlo»):** nombres correctos
-   (Montserrat los pasa; los actuales Essential / Signature / Private son
-   provisionales), características reales y **fotos que ilustren cada
-   membresía**. Enrique dijo «mando aquí la info de membresías al día de hoy»
-   pero esa info **no llegó en las capturas** → pedirla a Angel.
+6. `[x]` **Membresías («Elige cómo quieres vivirlo»).** Angel pasó
+   `DINAMO-PRECIOS2026-PDF.pdf` (enero 2026). Sección reescrita con los
+   **cuatro planes oficiales por franja horaria**: **Total** $6,990 (L–J 6 AM–
+   10 PM, V 6 AM–8 PM, S–D 7 AM–3 PM; bienvenida: 1 cámara hiperbárica + 1
+   botas de compresión), **Core** $5,490 (L–J 9 AM–5 PM, V 9 AM–8 PM, S–D
+   7 AM–3 PM; bienvenida: una de las dos), **Burn** $4,290 (L–J 5–10 PM, V 5–8
+   PM), **Pulse** $3,890 (L–V 1–4 PM, S–D 7 AM–3 PM). Todos: clases
+   presenciales ilimitadas y Technogym Checkup sin costo. Debajo: **Entry
+   Privilege $4,500** (inscripción única), «consulta nuestros planes
+   anuales», los beneficios de socio del PDF (50 % en hiperbárica y botas,
+   nutrición, Contorno, 10 % Latte Latte, on-demand…) y el legal (precios
+   sujetos a cambio; sesiones de bienvenida se agendan en youthforus.mx).
+   Fotos por franja: Total = todo el club; Core = el club de día
+   (coworking, terraza, pilates); Burn = tarde-noche (gym-dark, fachada de
+   noche, fuerza); Pulse = mediodía (runners, funcional). Retícula: 4
+   columnas, 2 entre 700 y 1100 px, 1 en móvil. Essential/Signature/Private
+   desaparecen. Verificado por DOM a 1707 px (4 tarjetas de 299×496 en una
+   fila); pendiente mirarlo con ojos.
+   **Corrección colateral:** el manifiesto decía «24/7 · Acceso» y el club
+   abre de 6 AM a 10 PM; ahora dice «6 AM · Abrimos entre semana». Los otros
+   dos datos (3 pisos, +40 clases/semana) no están en el PDF: confirmar.
 7. `[x]` **«Valoración inicial»:** añadir **«Technogym checkup»**, y dejar
    claro que **el primer checkup está incluido en todas las membresías**.
    Hecho: la FAQ «¿La valoración inicial está incluida?» responde «Sí, en
@@ -297,10 +313,9 @@ usa WebGL a mano); conviene actualizarlo.
   desplegar.
 - WhatsApp cachea la previsualización: tras el deploy hay que compartir el
   enlace con un parámetro nuevo (`?v=2`) o esperar a que expire la caché.
-- **Punto 6 (membresías) sin hacer**: la info de membresías no está en el
-  chat capturado. Angel: pasar nombres, características y qué foto ilustra
-  cada una. Las tarjetas ya están preparadas para ello (`.plan-bg` rota
-  fotos; basta cambiar la lista de `<img>`).
+- **Membresías hechas con el PDF de enero 2026.** Cuando cambien precios,
+  editar sólo las tarjetas de `#membresias` (y el bloque `.plans-notes`).
+  Confirmar «3 pisos» y «+40 clases/semana» del manifiesto.
 - **Punto 4**: si Enrique quiere aún más oscuro, las candidatas siguientes
   son «Todo lo que necesitas» (lista con fotos al hover) y El espacio
   (galería); las de lectura larga (manifiesto, timeline) deberían seguir

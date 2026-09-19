@@ -1892,7 +1892,8 @@ html.menu-lock { overflow: hidden; }
 .plans {
   margin-top: clamp(2.5rem, 6vh, 4rem);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* cuatro planes (precios enero 2026); a 2 columnas entre 700 y 1100 px */
+  grid-template-columns: repeat(4, 1fr);
   gap: clamp(0.5rem, 0.9vw, 0.9rem);
 }
 .plan {
@@ -1977,7 +1978,33 @@ html.menu-lock { overflow: hidden; }
   background: var(--accent);
 }
 .plan.feat { border-color: var(--ink); }
-@media (max-width: 900px) { .plans { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .plans { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px) { .plans { grid-template-columns: 1fr; } }
+
+.plans-intro { margin-top: 1.4rem; max-width: 52ch; }
+.plan .price .cur { display: inline; margin: 0 0.1em 0 0; font-size: 0.5em; font-weight: 300; vertical-align: 0.55em; letter-spacing: 0; color: rgba(244, 241, 236, 0.7); }
+.plan { min-height: 31rem; }
+.plan .price { font-size: clamp(1.7rem, 2.4vw, 2.4rem); }
+/* Entry Privilege + beneficios de socio + legal, bajo las tarjetas */
+.plans-notes {
+  margin-top: clamp(1.6rem, 3.5vh, 2.6rem);
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) 2fr;
+  gap: clamp(1.2rem, 3vw, 3rem);
+  padding-top: clamp(1.4rem, 3vh, 2rem);
+  border-top: 1px solid var(--line-light);
+}
+.plans-notes .small { letter-spacing: 0.22em; text-transform: uppercase; font-size: 0.6rem; font-weight: 600; color: rgba(244, 241, 236, 0.6); }
+.plans-entry-price { margin: 0.5rem 0 0.6rem; font-size: clamp(1.8rem, 2.6vw, 2.6rem); font-weight: 200; line-height: 1; }
+.plans-entry-price small { font-size: 0.5em; font-weight: 300; vertical-align: 0.55em; color: rgba(244, 241, 236, 0.7); }
+.plans-benefits ul { list-style: none; margin-top: 0.8rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem 1.6rem; }
+.plans-benefits li { position: relative; padding-left: 1rem; font-size: 0.8rem; font-weight: 300; color: rgba(244, 241, 236, 0.82); }
+.plans-benefits li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 4px; height: 4px; background: var(--accent); }
+.plans-legal { grid-column: 1 / -1; text-transform: none; letter-spacing: 0; font-weight: 300; font-size: 0.7rem; max-width: 80ch; color: rgba(244, 241, 236, 0.5); }
+@media (max-width: 760px) {
+  .plans-notes { grid-template-columns: 1fr; }
+  .plans-benefits ul { grid-template-columns: 1fr; }
+}
 
 /* ============================================================
    CTA + PIE
