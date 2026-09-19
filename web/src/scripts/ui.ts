@@ -210,22 +210,32 @@ for (const el of Array.from(document.querySelectorAll<HTMLElement>("[data-magnet
 }
 
 /* ---------- parallax de imágenes ---------- */
-type Par = { box: HTMLElement; v: number };
+/* Toda la geometría se mide UNA vez (measureAll) y por frame sólo se resta el
+   scroll: getBoundingClientRect por elemento y frame obligaba al motor a
+   recalcular layout entre cada escritura de estilo (lectura-escritura
+   alternada), que es justo lo que produce bajones de fps al scrollear. */
+type Par = { box: HTMLElement; v: number; top: number; h: number; on: boolean };
 let pars: Par[] = [];
 
 function measurePars() {
   pars = Array.from(document.querySelectorAll<HTMLElement>("[data-par]")).map(
-    (box) => ({ box, v: Number(box.dataset.par ?? 0.08) })
+    (box) => ({ box, v: Number(box.dataset.par ?? 0.08), top: absTop(box), h: box.offsetHeight,
+                on: box.classList.contains("par-on") })
   );
 }
 
-function syncPars() {
+function syncPars(sy: number) {
   for (const p of pars) {
-    const r = p.box.getBoundingClientRect();
-    if (r.bottom < -200 || r.top > innerHeight + 200) continue;
+    const top = p.top - sy;
+    // .par-on promueve la foto a capa de GPU exactamente mientras se le
+    // escribe --py: ni una capa de más fuera de pantalla, ni un repintado
+    // sin capa dentro. Fuera del margen no se toca nada.
+    const near = !(top + p.h < -200 || top > innerHeight + 200);
+    if (near !== p.on) { p.on = near; p.box.classList.toggle("par-on", near); }
+    if (!near) continue;
     // -1 arriba del viewport, +1 abajo
-    const f = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
-    setVar(p.box, "--py", `${(-f * r.height * p.v).toFixed(1)}px`);
+    const f = (top + p.h / 2 - innerHeight / 2) / innerHeight;
+    setVar(p.box, "--py", `${(-f * p.h * p.v).toFixed(1)}px`);
   }
 }
 
@@ -237,31 +247,37 @@ function syncPars() {
    gesto se vuelve suave. Se puede afinar por elemento con data-fix="0.3".
    El clamp evita descubrir los bordes cuando el marco asoma por arriba o abajo. */
 const FIX_SUAVE = 0.4;
-const fixedBoxes = Array.from(
-  document.querySelectorAll<HTMLElement>("[data-fix]")
-).map((box) => ({ box, k: Number(box.dataset.fix) || FIX_SUAVE }));
+let fixedBoxes: { box: HTMLElement; k: number; top: number; h: number }[] = [];
+function measureFixed() {
+  fixedBoxes = Array.from(document.querySelectorAll<HTMLElement>("[data-fix]")).map(
+    (box) => ({ box, k: Number(box.dataset.fix) || FIX_SUAVE, top: absTop(box), h: box.offsetHeight })
+  );
+}
 
-function syncFixed() {
-  for (const { box, k } of fixedBoxes) {
-    const r = box.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) continue;
-    const fy = Math.min(0, Math.max(-(innerHeight - r.height), -r.top * k));
-    setVar(box, "--fy", `${fy.toFixed(1)}px`);
+function syncFixed(sy: number) {
+  for (const b of fixedBoxes) {
+    const top = b.top - sy;
+    if (top + b.h < 0 || top > innerHeight) continue;
+    const fy = Math.min(0, Math.max(-(innerHeight - b.h), -top * b.k));
+    setVar(b.box, "--fy", `${fy.toFixed(1)}px`);
   }
 }
 
 /* ---------- bandas cinéticas de las submarcas ----------
    Se desplazan según dónde estén en el viewport, no con el reloj: el gesto lo
    manda el scroll, igual que el resto del recorrido. */
-const kinetics = Array.from(
-  document.querySelectorAll<HTMLElement>(".yvy-row, .lab-mrow")
-).map((el) => ({ el, dir: Number(el.dataset.dir ?? 1) }));
+let kinetics: { el: HTMLElement; dir: number; top: number; h: number }[] = [];
+function measureKinetics() {
+  kinetics = Array.from(document.querySelectorAll<HTMLElement>(".yvy-row, .lab-mrow")).map(
+    (el) => ({ el, dir: Number(el.dataset.dir ?? 1), top: absTop(el), h: el.offsetHeight })
+  );
+}
 
-function syncKinetics() {
+function syncKinetics(sy: number) {
   for (const k of kinetics) {
-    const r = k.el.getBoundingClientRect();
-    if (r.bottom < -200 || r.top > innerHeight + 200) continue;
-    const f = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+    const top = k.top - sy;
+    if (top + k.h < -200 || top > innerHeight + 200) continue;
+    const f = (top + k.h / 2 - innerHeight / 2) / innerHeight;
     setVar(k.el, "--kx", `${(k.dir * f * -18).toFixed(2)}vw`);
   }
 }
@@ -424,7 +440,14 @@ function syncTour(dt: number) {
 const ccTrack = document.getElementById("ccTrack");
 const ccArrows = Array.from(document.querySelectorAll<HTMLButtonElement>(".cc-arrow"));
 // deriva automática del carrusel; se asigna dentro del bloque y la llama el bucle
-let ccDrift: (dt: number) => void = () => {};
+let ccDrift: (dt: number, sy: number) => void = () => {};
+let ccTop = 0;
+let ccH = 0;
+function measureCc() {
+  if (!ccTrack) return;
+  ccTop = absTop(ccTrack);
+  ccH = ccTrack.offsetHeight;
+}
 
 if (ccTrack) {
   const paso = () => {
@@ -504,24 +527,22 @@ if (ccTrack) {
      El avance acumula en float propio — a ~0.4 px/frame, confiar en el
      redondeo de scrollLeft podría dejarlo clavado. */
   let autoDir = 1;
-  let autoPausa = false;
   let autoHold = 0;
   let autoX = -1;
   const tregua = () => { autoHold = performance.now() + 3500; };
-  ccTrack.addEventListener("pointerenter", () => { autoPausa = true; });
-  ccTrack.addEventListener("pointerleave", () => { autoPausa = false; });
-  ccTrack.addEventListener("focusin", () => { autoPausa = true; });
-  ccTrack.addEventListener("focusout", () => { autoPausa = false; });
+  // El cursor encima NO detiene la deriva (petición de Angel): la galería
+  // sigue moviéndose mientras se mira. Sólo paran el arrastre y, unos
+  // segundos, un gesto explícito (flechas, rueda, táctil).
   ccTrack.addEventListener("touchstart", tregua, { passive: true });
   ccTrack.addEventListener("wheel", tregua, { passive: true });
   for (const b of ccArrows) b.addEventListener("click", tregua);
 
-  ccDrift = (dt: number) => {
-    const parado = autoPausa || arrastrando || document.hidden ||
+  ccDrift = (dt: number, sy: number) => {
+    const parado = arrastrando || document.hidden ||
       performance.now() < autoHold;
     if (parado) { ccTrack.classList.remove("auto"); autoX = -1; return; }
-    const r = ccTrack.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) { ccTrack.classList.remove("auto"); autoX = -1; return; }
+    const top = ccTop - sy;
+    if (top + ccH < 0 || top > innerHeight) { ccTrack.classList.remove("auto"); autoX = -1; return; }
     const max = ccTrack.scrollWidth - ccTrack.clientWidth;
     if (max <= 0) return;
     // sin encaje ni scroll suave mientras deriva: pelearían contra el avance
@@ -540,6 +561,8 @@ if (ccTrack) {
 const stripTrack = document.querySelector<HTMLElement>(".strip p");
 let stripX = 0;
 let stripUnit = 0;
+let stripTop = 0;
+let stripH = 0;
 function measureStrip() {
   if (!stripTrack) return;
   const originals = Array.from(stripTrack.children) as HTMLElement[];
@@ -550,6 +573,8 @@ function measureStrip() {
   }
   const first = stripTrack.firstElementChild as HTMLElement | null;
   stripUnit = first ? first.getBoundingClientRect().width : 0;
+  stripTop = absTop(stripTrack);
+  stripH = stripTrack.offsetHeight;
 }
 
 /* ---------- cabecera ---------- */
@@ -693,12 +718,20 @@ const uniItems = uniCloud
 const UNI_TRAVEL = 2600;
 let uniP = 0;
 
-function syncUni(dt: number) {
+let uniTop = 0;
+let uniH = 0;
+function measureUni() {
+  if (!uniSec) return;
+  uniTop = absTop(uniSec);
+  uniH = uniSec.offsetHeight;
+}
+
+function syncUni(dt: number, sy: number) {
   if (!uniSec || !uniCloud || !uniItems.length) return;
-  const r = uniSec.getBoundingClientRect();
-  if (r.bottom < 0 || r.top > innerHeight) return;
-  const total = Math.max(1, r.height - innerHeight);
-  const objetivo = Math.max(0, Math.min(1, -r.top / total));
+  const top = uniTop - sy;
+  if (top + uniH < 0 || top > innerHeight) return;
+  const total = Math.max(1, uniH - innerHeight);
+  const objetivo = Math.max(0, Math.min(1, -top / total));
 
   // El avance persigue a la posición del scroll en vez de copiarla. Con un
   // desplazamiento brusco, la cámara ya no salta de golpe: recorre la nube y
@@ -774,11 +807,16 @@ function countUp(el: HTMLElement) {
   requestAnimationFrame(step);
 }
 
-const counters = Array.from(document.querySelectorAll<HTMLElement>("[data-count]"));
+let counters: { el: HTMLElement; top: number }[] = [];
+function measureCounters() {
+  counters = Array.from(document.querySelectorAll<HTMLElement>("[data-count]")).map(
+    (el) => ({ el, top: absTop(el) })
+  );
+}
 function syncCounters(sy: number) {
   const bottom = sy + innerHeight * 0.85;
   for (const c of counters) {
-    if (c.dataset.done !== "1" && absTop(c) < bottom) countUp(c);
+    if (c.el.dataset.done !== "1" && c.top < bottom) countUp(c.el);
   }
 }
 
@@ -795,13 +833,21 @@ const crossTiles = crossEl
     }))
   : [];
 
-function syncCross() {
+let crossTop = 0;
+let crossH = 0;
+function measureCross() {
+  if (!crossEl) return;
+  crossTop = absTop(crossEl);
+  crossH = crossEl.offsetHeight;
+}
+
+function syncCross(sy: number) {
   if (!crossEl || !crossTiles.length) return;
-  const r = crossEl.getBoundingClientRect();
-  if (r.bottom < -150 || r.top > innerHeight + 150) return;
+  const top = crossTop - sy;
+  if (top + crossH < -150 || top > innerHeight + 150) return;
   // +1 con la cruz abajo del viewport, 0 centrada, -1 ya arriba
   const f = Math.max(-1, Math.min(1,
-    (r.top + r.height / 2 - innerHeight / 2) / innerHeight));
+    (top + crossH / 2 - innerHeight / 2) / innerHeight));
   for (const t of crossTiles) {
     // z crece de forma monótona al avanzar: 1 al llegar, 1+k al salir
     const z = 1 + (1 - f) * 0.5 * t.k;
@@ -810,21 +856,53 @@ function syncCross() {
 }
 
 /* ---------- medición y bucle ---------- */
+let dirty = true;
 function measureAll() {
   measureReveals();
   measurePars();
+  measureFixed();
+  measureKinetics();
+  measureUni();
+  measureCross();
+  measureCounters();
+  measureCc();
   measureSecs();
   measureStrip();
+  dirty = true;
+}
+// Varias causas pueden pedir remedir en el mismo instante (resize, fuentes,
+// load): se agrupan en un solo frame. Antes cada foto diferida al cargar
+// lanzaba una medición completa (cientos de lecturas de layout) en pleno
+// scroll: ésa era la fuente principal de los bajones en frío. Ahora los
+// cambios de alto los detecta el ResizeObserver de abajo, una vez por frame.
+let measureQueued = false;
+function requestMeasure() {
+  if (measureQueued) return;
+  measureQueued = true;
+  requestAnimationFrame(() => { measureQueued = false; measureAll(); });
 }
 measureAll();
-addEventListener("resize", measureAll);
-if (document.fonts) document.fonts.ready.then(measureAll);
-// Las fotos diferidas entran después de la primera medición y desplazan todo lo
-// que va debajo: sin volver a medir, los bloques posteriores quedan clasificados
-// con posiciones viejas y no llegan a revelarse nunca.
-addEventListener("load", measureAll);
-for (const img of Array.from(document.images)) {
-  if (!img.complete) img.addEventListener("load", () => measureAll(), { once: true });
+addEventListener("resize", requestMeasure);
+if (document.fonts) document.fonts.ready.then(requestMeasure);
+addEventListener("load", requestMeasure);
+
+/* ---------- visibilidad por sección ----------
+   Las animaciones CSS infinitas (aurora de OASIS, zoom de las tarjetas de
+   marcas, pulso del hero) y la nube 3D del universo sólo trabajan mientras su
+   sección está cerca del viewport: fuera, el compositor no tiene por qué
+   tocarlas en cada frame. La clase .vis la pone este observador. */
+{
+  const watched = Array.from(document.querySelectorAll<HTMLElement>(
+    "#hero, #universo, #ecosistema, #oasis, .cross"
+  ));
+  if (watched.length && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) (e.target as HTMLElement).classList.toggle("vis", e.isIntersecting);
+    }, { rootMargin: "25% 0px 25% 0px" });
+    for (const el of watched) io.observe(el);
+  } else {
+    for (const el of watched) el.classList.add("vis");
+  }
 }
 
 // El observador se agrupa en el siguiente frame y sólo remide si el documento
@@ -845,27 +923,37 @@ new ResizeObserver(() => {
 }).observe(document.body);
 
 let lastT = performance.now();
+let lastSy = -1;
 function frame(now: number) {
   const dt = Math.min(0.05, (now - lastT) / 1000);
   lastT = now;
   const sy = document.documentElement.scrollTop;
-  syncHeader(sy);
+  // Con la página quieta no hay nada que recalcular: todo lo atado al scroll
+  // se salta hasta que cambie (o hasta que una medición nueva lo pida).
+  const moved = sy !== lastSy || dirty;
+  lastSy = sy;
+  dirty = false;
+  if (moved) {
+    syncHeader(sy);
+    syncReveals(sy);
+    syncCounters(sy);
+  }
   syncHeroSalida(sy);
   syncTour(dt);
-  syncReveals(sy);
-  syncCounters(sy);
   if (!reduced) {
-    syncPars();
-    syncFixed();
-    syncCross();
-    syncUni(dt);
-    syncKinetics();
-    ccDrift(dt);
+    if (moved) {
+      syncPars(sy);
+      syncFixed(sy);
+      syncCross(sy);
+      syncKinetics(sy);
+    }
+    syncUni(dt, sy);
+    ccDrift(dt, sy);
     if (stripTrack && stripUnit > 0) {
       // sólo avanza en pantalla: fuera de cuadro el transform por frame es
       // trabajo tirado (y el gesto no se pierde, es un ciclo continuo)
-      const sr = stripTrack.getBoundingClientRect();
-      if (sr.bottom > 0 && sr.top < innerHeight) {
+      const st = stripTop - sy;
+      if (st + stripH > 0 && st < innerHeight) {
         stripX -= dt * 34;
         if (stripX <= -stripUnit) stripX += stripUnit;
         stripTrack.style.transform = `translateX(${stripX.toFixed(1)}px)`;

@@ -211,9 +211,16 @@ img { max-width: 100%; display: block; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: translate3d(0, var(--py, 0px), 0) scale(1.14);
-  will-change: transform;
+  /* transform 2D y sin will-change en reposo: así una foto fuera de pantalla
+     NO es una capa de GPU. Había ~80 fotos promovidas a capa a la vez (cada
+     una con su textura del tamaño de la foto), fuera de vista incluidas. */
+  transform: translateY(var(--py, 0px)) scale(1.14);
 }
+/* La capa se crea sólo mientras el marco está cerca del viewport (.in lo
+   pone el sistema de reveals, con histéresis): el parallax se mueve en el
+   compositor sin repintar, y al salir la capa se libera. */
+.par-on img { will-change: transform; }
+.plan-bg img:not(.on) { will-change: auto; }
 
 /* ============================================================
    HEADER
@@ -265,6 +272,7 @@ img { max-width: 100%; display: block; }
    3D del fondo, que ahora es el único que lleva color. */
 .hd-logo svg { width: clamp(1.5rem, 2.4vw, 2.1rem); height: auto; color: inherit; }
 .hd-logo b {
+  margin-right: -0.34em; /* el tracking deja aire tras la O; el isotipo va a la derecha */
   font-weight: 500;
   font-stretch: 112%;
   font-size: clamp(1.02rem, 1.5vw, 1.32rem);
@@ -431,6 +439,8 @@ html.menu-lock { overflow: hidden; }
    y la tipografía puede ir en tinta. */
 .hero {
   position: relative;
+  /* Se probó en negro (2026-09-18) y Angel lo devolvió a blanco: sobre negro
+     se notan los cantos del recorte de la atleta. */
   background: linear-gradient(168deg, #ffffff 0%, #fbfaf8 46%, #f2efea 100%);
   color: var(--ink);
   min-height: 100vh;
@@ -660,8 +670,8 @@ html.menu-lock { overflow: hidden; }
    cada pieza */
 .cross-t img {
   transform: scale(var(--cz, 1));
-  will-change: transform;
 }
+.cross.vis .cross-t img { will-change: transform; }
 .cross .t1 { grid-area: 1 / 5 / 3 / 9; }
 .cross .t2 { grid-area: 3 / 1 / 6 / 5; }
 .cross .t4 { grid-area: 3 / 5 / 6 / 9; }
@@ -676,9 +686,20 @@ html.menu-lock { overflow: hidden; }
   border: 5px solid var(--bone);
 }
 @media (max-width: 900px) {
-  .cross { grid-template-columns: repeat(2, 1fr); grid-auto-rows: clamp(7rem, 24vw, 11rem); }
-  .cross-t { grid-area: auto; }
-  .cross .t4 { grid-column: 1 / -1; }
+  /* OJO: `.cross-t { grid-area: auto }` NO anulaba las áreas de escritorio
+     (`.cross .t1` pesa más), así que en móvil las piezas seguían clavadas en
+     celdas de una retícula de 12 columnas que ya no existía: fotos diminutas
+     y huecos (captura de Angel). Se anula con la misma especificidad y se
+     recompone: fotos anchas a sangre alternando con pares a media anchura. */
+  .cross {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: clamp(5.5rem, 22vw, 9rem);
+    grid-auto-flow: dense;
+    gap: 0.6rem;
+    margin-top: clamp(2.5rem, 8vh, 4rem);
+  }
+  .cross .cross-t { grid-area: auto; grid-row: span 2; }
+  .cross .t1, .cross .t4, .cross .t7 { grid-column: 1 / -1; }
   .cross .t3, .cross .t6, .cross .t8 { display: none; }
 }
 
@@ -812,6 +833,8 @@ html.menu-lock { overflow: hidden; }
   opacity: var(--uo, 0);
   overflow: hidden;
 }
+/* lejos del universo, la nube (45 figuras 3D) ni se pinta ni se compone */
+.uni:not(.vis) .uni-cloud { content-visibility: hidden; }
 .uni-it img {
   width: 100%;
   height: 100%;
@@ -1171,14 +1194,33 @@ html.menu-lock { overflow: hidden; }
 /* ============================================================
    CREDO · YOU VS YOU
    ============================================================ */
+/* Recrea la portada del brandbook (petición de Angel): negro puro, el
+   velocista saliendo de los tacos a la derecha, dos barras grandes
+   blanco→amarillo arriba a la izquierda, carriles verticales finos y el
+   texto abajo a la derecha, donde la portada lleva el logo. */
 .creed {
   position: relative;
   overflow: hidden;
+  background: #000;
   min-height: clamp(78vh, 96vh, 58rem);
   display: grid;
-  place-items: center;
-  padding: clamp(6rem, 16vh, 12rem) var(--pad);
-  text-align: center;
+  align-items: end;
+  justify-items: end;
+  padding: clamp(6rem, 16vh, 12rem) var(--pad) clamp(3.5rem, 9vh, 6rem);
+  text-align: right;
+}
+/* carriles verticales como en la portada: seis franjas */
+.creed::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* un filete de 1 px al final de cada sexto; con repeating-gradient y calc()
+     Chrome pintaba sólo dos líneas */
+  background-image: linear-gradient(90deg, transparent calc(100% - 1px), rgba(255, 255, 255, 0.13) 0);
+  background-size: calc(100% / 6) 100%;
+  background-repeat: repeat-x;
 }
 /* La foto ocupa la sección entera y el texto va encima: el bloque negro con la
    imagen aparte partía la escena en dos. */
@@ -1187,7 +1229,8 @@ html.menu-lock { overflow: hidden; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 28%;
+  /* el velocista a la derecha del cuadro, como en la portada */
+  object-position: 68% 60%;
   transform: translate3d(0, var(--py, 0px), 0) scale(1.14);
 }
 /* Velo doble: el radial hunde el centro para que la tipografía blanca no pelee
@@ -1200,18 +1243,27 @@ html.menu-lock { overflow: hidden; }
   z-index: 1;
   /* velo mínimo (petición de Angel: la foto casi natural): un lecho suave
      tras la tipografía y un cierre ligero en los bordes, nada más */
-  background:
-    radial-gradient(60% 46% at 50% 52%, rgba(10, 10, 8, 0.38) 0%, rgba(10, 10, 8, 0.16) 60%, transparent 100%),
-    linear-gradient(180deg, rgba(20, 19, 15, 0.38) 0%, transparent 22%,
-                    transparent 78%, rgba(20, 19, 15, 0.42) 100%);
+  /* la foto ya es negra: sólo un cierre leve abajo para que el texto asiente */
+  background: linear-gradient(180deg, transparent 70%, rgba(0, 0, 0, 0.45) 100%);
   pointer-events: none;
 }
 .creed-inner {
   position: relative;
   z-index: 2;
   display: grid;
-  justify-items: center;
-  gap: 1.8rem;
+  justify-items: end;
+  gap: 1.4rem;
+  max-width: 34rem;
+}
+.creed-mark { margin: 0.4rem 0 0; }
+/* OJO tamaño mínimo: las dos barras de la izquierda del isotipo van en la
+   misma diagonal con un hueco de ~9 % del alto; por debajo de ~3.2 rem el
+   antialias las funde y el isotipo parece de DOS barras (captura de Angel). */
+.creed-mark svg { width: clamp(3.2rem, 3.8vw, 3.8rem); }
+@media (max-width: 760px) {
+  .creed { justify-items: start; text-align: left; }
+  .creed-inner { justify-items: start; }
+  .creed-media img { object-position: 62% 60%; }
 }
 .creed-line {
   font-weight: 200;
@@ -1397,11 +1449,26 @@ html.menu-lock { overflow: hidden; }
   border-radius: 4px;
   color: var(--bone);
 }
-.eco-card .media { position: absolute; inset: 0; aspect-ratio: auto; }
+/* La foto NO sigue el ancho de la tarjeta: mide siempre lo que mide la
+   tarjeta expandida (3.2 de 5.2 partes de la fila = 62 vw) y va centrada.
+   Así, al animar flex-grow, la tarjeta sólo cambia su recorte sobre una
+   imagen ya rasterizada: antes cada frame re-encajaba (object-fit) y volvía
+   a pintar tres fotos grandes a la vez, y el hover iba a tirones. El encuadre
+   en reposo es el mismo: con estas proporciones la escala la fija la altura,
+   no el ancho. */
+.eco-card .media {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  width: 62vw;
+  margin-left: -31vw;
+  aspect-ratio: auto;
+}
+.ecofs.vis .eco-card .media img { will-change: transform; }
 /* zoom in permanente (Ken Burns): la foto se acerca y se aleja muy despacio,
    siempre en movimiento — la propiedad scale compone con el transform del
    parallax sin pisarlo */
 .eco-card .media img { animation: eco-zoom 16s ease-in-out infinite alternate; }
+.ecofs:not(.vis) .eco-card .media img { animation-play-state: paused; }
 @keyframes eco-zoom {
   from { scale: 1; }
   to { scale: 1.16; }
@@ -1412,7 +1479,9 @@ html.menu-lock { overflow: hidden; }
 .eco-card::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 0 auto 0 50%;
+  width: 62vw;
+  margin-left: -31vw;
   z-index: 1;
   background: linear-gradient(0deg, rgba(10, 10, 8, 0.92) 0%,
               rgba(10, 10, 8, 0.55) 38%, rgba(10, 10, 8, 0.05) 68%, transparent 100%);
@@ -1443,6 +1512,7 @@ html.menu-lock { overflow: hidden; }
   .ecofs .eco-card { height: clamp(22rem, 55vh, 30rem); }
   /* en columna la expansión no aplica: crecería en alto */
   .eco > .eco-card:hover { flex-grow: 1; }
+  .eco-card .media, .eco-card::after { inset: 0; width: auto; margin-left: 0; }
 }
 
 /* ============================================================
@@ -1624,6 +1694,8 @@ html.menu-lock { overflow: hidden; }
 }
 .stamp svg { width: clamp(0.95rem, 1.5vw, 1.4rem); height: auto; display: block; color: var(--accent); }
 .stamp b {
+  margin-left: 0;
+  margin-right: -0.34em; /* el tracking deja aire tras la O; el isotipo va pegado como en el lockup oficial */
   font-weight: 500;
   font-stretch: 112%;
   font-size: clamp(0.5rem, 0.7vw, 0.64rem);
@@ -1833,9 +1905,10 @@ html.menu-lock { overflow: hidden; }
   opacity: 0;
   transition: opacity 1.4s var(--ease);
   /* parallax interno: la escala da recorrido sin descubrir bordes */
-  transform: translate3d(0, var(--py, 0px), 0) scale(1.14);
-  will-change: transform;
+  transform: translateY(var(--py, 0px)) scale(1.14);
 }
+/* de las 45 fotos de fondo sólo la visible es capa; la que se va fundiendo
+   la promueve el propio motor mientras dura la transición de opacidad */
 .plan-bg img.on { opacity: 1; }
 .plan-bg::after {
   content: "";
@@ -1969,6 +2042,7 @@ html.menu-lock { overflow: hidden; }
 }
 .ft-mark svg { width: 1rem; height: auto; color: var(--ink); }
 .ft-mark b {
+  margin-right: -0.32em;
   font-weight: 500;
   font-stretch: 112%;
   font-size: 0.8rem;
@@ -2229,6 +2303,7 @@ html.menu-lock { overflow: hidden; }
   animation: aurora 16s ease-in-out infinite alternate;
   will-change: transform;
 }
+.oasis:not(.vis) .oasis-aurora { animation-play-state: paused; }
 @keyframes aurora {
   0% { transform: rotate(0deg) scale(1); }
   50% { transform: rotate(4deg) scale(1.12); }
@@ -2890,3 +2965,68 @@ html.tour-abierto { overflow: hidden; }
 .gold-band-iso rect:nth-child(2) { transition-delay: 0.34s; }
 .gold-band-iso rect:nth-child(3) { transition-delay: 0.48s; }
 .gold-band.in .gold-band-iso rect { opacity: 1; }
+
+/* ============================================================
+   BARRAS DIAGONALES DEL BRANDBOOK (petición de Enrique, 2026-09-18)
+   Dos trazos amarillos a 45°, con degradado a transparente, cruzando la
+   foto en blanco y negro, como en la portada del brandbook. Se dibujan con
+   CSS puro: entran deslizándose por su propio eje al hacer scroll.
+   ============================================================ */
+.bars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+/* El SVG es el isotipo oficial; el degradado va en unidades de la caja de
+   cada rect (objectBoundingBox), es decir, A LO LARGO de cada barra antes
+   de girarla: la cola inferior izquierda de las tres se va a blanco, como
+   en la portada. Cortado por el borde izquierdo a propósito. */
+.bars svg {
+  position: absolute;
+  left: -7vw;
+  top: -6vh;
+  width: clamp(22rem, 46vw, 44rem);
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.bars rect {
+  opacity: 0;
+  transition: opacity 1.1s var(--ease);
+}
+.bars rect:nth-child(1) { transition-delay: 0.05s; }
+.bars rect:nth-child(2) { transition-delay: 0.32s; }
+.bars rect:nth-child(3) { transition-delay: 0.18s; }
+.bars.in rect { opacity: 1; }
+.bars.above rect { opacity: 0; }
+/* .rv[data-rv] recibe `transform: none` al entrar: las barras no son un rv
+   normal, así que se anula ese override en el contenedor */
+.rv.bars, .rv.bars.in, .rv.bars.above { transform: none; opacity: 1; }
+@media (max-width: 760px) {
+  .bars svg { width: 70vw; left: -12vw; top: -2vh; }
+}
+
+/* Membresías y preguntas sobre fondo de tinta (menos blanco: petición de
+   Enrique). Bordes y líneas pasan a la variante clara. */
+.dark .plan { border-color: var(--line-light); }
+.dark .plan.feat { border-color: var(--accent); }
+.dark .faq, .dark .faq-item { border-color: var(--line-light); }
+.dark .faq-item summary { color: var(--bone); }
+
+/* ------------------------------------------------------------
+   Fondos oscuros por criterio (Enrique, 2026-09-18). Regla de contraste:
+   el amarillo de marca sólo pinta texto sobre tinta; sobre hueso el énfasis
+   del titular va en tinta (peso 500 ya lo distingue). FFE700 sobre F4F1EC
+   da 1.2:1 de contraste: ilegible para cualquiera, no sólo para baja visión.
+   ------------------------------------------------------------ */
+[data-theme="light"] .display em,
+[data-theme="light"] .hero-claim em { color: var(--ink); }
+
+/* Technogym (split) y Conceptos (carrusel) pasan a tinta: contenido de
+   rendimiento y tecnología, fotos oscuras, tarjetas que ya eran oscuras. */
+.dark .cc-arrow { color: var(--bone); border-color: var(--line-light); }
+.dark .cc-arrow:hover { color: var(--ink); }
+.dark .cc-arrow[disabled]:hover { border-color: var(--line-light); }
+

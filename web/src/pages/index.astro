@@ -1,6 +1,9 @@
 ---
 import "../styles/global.css";
 
+// og:image debe ser URL absoluta: sale de `site` en astro.config.mjs.
+const ogImage = new URL("/og.jpg", Astro.site).href;
+
 const experiencia = [
   { n: "01", t: "Entrenamiento", d: "Peso libre, integrado y cardio", img: "/img/site/galeria-1.jpg" },
   { n: "02", t: "Technogym", d: "Equipamiento de última generación", img: "/img/technogym.jpg" },
@@ -59,7 +62,9 @@ const oasisServicios = [
 
 const iso = `<svg viewBox="0 0 1346 1152" aria-hidden="true"><g fill="currentColor"><rect x="2180" y="1339.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2563.5 1416)"/><rect x="2832" y="1588.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 3215.5 1665)"/><rect x="2137.4" y="1839.8" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2521 1916.5)"/></g></svg>`;
 
-const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>`;
+// lockup horizontal oficial: la palabra y el isotipo a su DERECHA (portada
+// del brandbook); a la izquierda no es el logo (observación de Enrique)
+const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>`;
 ---
 
 <html lang="es">
@@ -72,6 +77,25 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       content="DINAMO. Un santuario contemporáneo del bienestar en Polanco: entrenamiento de alto rendimiento con Technogym, recovery, pilates y coworking. Energía activa que transforma."
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={Astro.site} />
+    <!-- previsualización al compartir (WhatsApp, iMessage, redes): logo oficial
+         sobre negro de marca. Si no hay og:image, WhatsApp inventa una tarjeta. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DINAMO" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:url" content={Astro.site} />
+    <meta property="og:title" content="DINAMO — Gym | Active Hub · Polanco" />
+    <meta property="og:description" content="YOU VS YOU. Entrenamiento de alto rendimiento con Technogym, recovery, pilates y coworking en Polanco." />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="DINAMO — Gym | Active Hub" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DINAMO — Gym | Active Hub · Polanco" />
+    <meta name="twitter:description" content="YOU VS YOU. Entrenamiento de alto rendimiento con Technogym, recovery, pilates y coworking en Polanco." />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="preload" href="/fonts/AcuminVariableConcept.otf" as="font" type="font/otf" crossorigin />
   </head>
 
@@ -92,8 +116,8 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       </button>
 
       <a class="hd-logo" href="#top" aria-label="DINAMO — inicio">
-        <Fragment set:html={iso} />
         <b>DINAMO</b>
+        <Fragment set:html={iso} />
       </a>
 
       <a class="hd-cta" href="#contacto" data-magnet>Agenda tu visita</a>
@@ -141,7 +165,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
           <span class="hb hb-floor"></span>
         </div>
         <div class="hero-figure" data-depth="0.35" aria-hidden="true">
-          <img src="/img/site/atleta-light.png" alt="" fetchpriority="high" />
+          <img decoding="async" src="/img/site/atleta-light.png" alt="" fetchpriority="high" />
         </div>
 
         <div class="hero-inner">
@@ -192,14 +216,14 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
 
         <!-- collage en cruz: interiores a distintas profundidades -->
         <div class="cross" aria-label="Interiores del club">
-          <div class="cross-t t1 media rv-img" data-depth="0.22"><img src="/img/recepcion.jpg" alt="Recepción" loading="lazy" /></div>
-          <div class="cross-t t2 media rv-img" data-depth="0.26" style="--d:1"><img src="/img/maquinas.jpg" alt="Sala de peso integrado" loading="lazy" /></div>
-          <div class="cross-t t3 media rv-img" data-depth="0.5" style="--d:2"><img src="/img/lamparas.jpg" alt="Lámparas de la recepción" loading="lazy" /></div>
-          <div class="cross-t t4 media rv-img" data-depth="0.1" style="--d:1"><img src="/img/terraza.jpg" alt="Terraza acristalada" loading="lazy" /></div>
-          <div class="cross-t t5 media rv-img" data-depth="0.26" style="--d:2"><img src="/img/cardio-sala.jpg" alt="Sala de cardio" loading="lazy" /></div>
-          <div class="cross-t t6 media rv-img" data-depth="0.5" style="--d:3"><img src="/img/spa.jpg" alt="Spa" loading="lazy" /></div>
-          <div class="cross-t t7 media rv-img" data-depth="0.22" style="--d:2"><img src="/img/vestidores.jpg" alt="Vestidores" loading="lazy" /></div>
-          <div class="cross-t t8 media rv-img" data-depth="0.45" style="--d:3"><img src="/img/funcional.jpg" alt="Zona funcional" loading="lazy" /></div>
+          <div class="cross-t t1 media rv-img" data-depth="0.22"><img decoding="async" src="/img/recepcion.jpg" alt="Recepción" loading="lazy" /></div>
+          <div class="cross-t t2 media rv-img" data-depth="0.26" style="--d:1"><img decoding="async" src="/img/maquinas.jpg" alt="Sala de peso integrado" loading="lazy" /></div>
+          <div class="cross-t t3 media rv-img" data-depth="0.5" style="--d:2"><img decoding="async" src="/img/lamparas.jpg" alt="Lámparas de la recepción" loading="lazy" /></div>
+          <div class="cross-t t4 media rv-img" data-depth="0.1" style="--d:1"><img decoding="async" src="/img/terraza.jpg" alt="Terraza acristalada" loading="lazy" /></div>
+          <div class="cross-t t5 media rv-img" data-depth="0.26" style="--d:2"><img decoding="async" src="/img/cardio-sala.jpg" alt="Sala de cardio" loading="lazy" /></div>
+          <div class="cross-t t6 media rv-img" data-depth="0.5" style="--d:3"><img decoding="async" src="/img/spa.jpg" alt="Spa" loading="lazy" /></div>
+          <div class="cross-t t7 media rv-img" data-depth="0.22" style="--d:2"><img decoding="async" src="/img/vestidores.jpg" alt="Vestidores" loading="lazy" /></div>
+          <div class="cross-t t8 media rv-img" data-depth="0.45" style="--d:3"><img decoding="async" src="/img/funcional.jpg" alt="Zona funcional" loading="lazy" /></div>
         </div>
       </section>
 
@@ -208,7 +232,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       <!-- ═══════ BANDA · RECEPCIÓN ═══════ -->
       <section class="sec band band-light" data-theme="dark">
         <div class="media still rv-img" data-rv="wipel" style="--pos: 50% 62%">
-          <img src="/img/escaleras.jpg" alt="Recepción y escalera principal de DINAMO" loading="lazy" />
+          <img decoding="async" src="/img/escaleras.jpg" alt="Recepción y escalera principal de DINAMO" loading="lazy" />
           <Fragment set:html={stamp} />
           </div>
         <div class="band-cap">
@@ -228,14 +252,37 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       <!-- ═══════ YOU VS YOU ═══════ -->
       <section class="sec creed dark bg-ink" data-theme="dark">
         <div class="creed-media rv-img" data-rv="wiper" data-par="0.14" aria-hidden="true">
-          <img src="/img/site/que-es-dinamo.jpg" alt="" loading="lazy" />
+          <img decoding="async" src="/img/site/sprinter-brandbook.jpg" alt="" loading="lazy" />
+        </div>
+        <!-- el isotipo COMPLETO (tres barras) a gran escala, como en la portada
+             del brandbook: cada barra con la cola (extremo inferior izquierdo)
+             fundida a blanco. Son los mismos rect del logo, así que las
+             proporciones son las oficiales. -->
+        <div class="bars rv" data-rv="bars" aria-hidden="true">
+          <svg viewBox="0 0 1346 1152" aria-hidden="true">
+            <defs>
+              <linearGradient id="barsGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#ffffff" />
+                <stop offset="0.5" stop-color="#ffe700" />
+                <stop offset="1" stop-color="#ffe700" />
+              </linearGradient>
+            </defs>
+            <g fill="url(#barsGrad)">
+              <rect x="2180" y="1339.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2563.5 1416)"/>
+              <rect x="2832" y="1588.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 3215.5 1665)"/>
+              <rect x="2137.4" y="1839.8" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2521 1916.5)"/>
+            </g>
+          </svg>
         </div>
         <div class="wrap creed-inner">
-          <div class="sec-mark rv"><Fragment set:html={iso} /></div>
           <p class="creed-line rv" data-lines style="--d:1">
             La única competencia<br />eres <em>tú</em>.
           </p>
           <p class="creed-tag rv" style="--d:2">You&nbsp;vs&nbsp;You</p>
+          <!-- el isotipo cierra el bloque abajo a la derecha, como el logo de la
+               portada; encima del titular caía sobre el cuerpo del velocista y
+               se perdían barras (captura de Angel) -->
+          <div class="sec-mark creed-mark rv" style="--d:3"><Fragment set:html={iso} /></div>
         </div>
       </section>
 
@@ -265,7 +312,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
             </ul>
             <figure class="exp-viewer" id="expViewer">
               {experiencia.map((e, i) => (
-                <img src={e.img} alt={e.t} class={i === 0 ? "on" : ""} loading="lazy" />
+                <img decoding="async" src={e.img} alt={e.t} class={i === 0 ? "on" : ""} loading="lazy" />
               ))}
             </figure>
           </div>
@@ -273,9 +320,9 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       </section>
 
       <!-- ═══════ TECHNOGYM ═══════ -->
-      <section class="sec split bg-bone" data-theme="light">
+      <section class="sec split dark bg-ink" data-theme="dark">
         <div class="media rv-img" data-par="0.1">
-          <img src="/img/maquinas.jpg" alt="Sala de máquinas Technogym" loading="lazy" />
+          <img decoding="async" src="/img/maquinas.jpg" alt="Sala de máquinas Technogym" loading="lazy" />
           <Fragment set:html={stamp} />
           </div>
         <div class="split-copy">
@@ -322,17 +369,17 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
         </ol>
         <!-- marco fijo: la foto de cada fila se despliega aquí al pasar el cursor -->
         <div class="day-peek rv-img" aria-hidden="true">
-          <img src="/img/peso-libre.jpg" alt="" loading="lazy" />
-          <img src="/img/lounge.jpg" alt="" loading="lazy" />
-          <img src="/img/coworking.jpg" alt="" loading="lazy" />
-          <img src="/img/sauna.jpg" alt="" loading="lazy" />
-          <img src="/img/terraza.jpg" alt="" loading="lazy" />
+          <img decoding="async" src="/img/peso-libre.jpg" alt="" loading="lazy" />
+          <img decoding="async" src="/img/lounge.jpg" alt="" loading="lazy" />
+          <img decoding="async" src="/img/coworking.jpg" alt="" loading="lazy" />
+          <img decoding="async" src="/img/sauna.jpg" alt="" loading="lazy" />
+          <img decoding="async" src="/img/terraza.jpg" alt="" loading="lazy" />
         </div>
         </div>
       </section>
 
       <!-- ═══════ CONCEPTOS · carrusel a sangre ═══════ -->
-      <section class="sec cc bg-bone" id="conceptos" data-theme="light">
+      <section class="sec cc dark bg-ink" id="conceptos" data-theme="dark">
         <div class="wrap cc-head">
           <h2 class="display rv" data-lines style="--d:1">Ocho formas<br />de entrenar <em>aquí</em>.</h2>
           <p class="lede rv" style="--d:2">
@@ -346,7 +393,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
           {conceptos.map((c, i) => (
             <article class="cc-card rv" data-rv="scale" style={`--d:${Math.min(i, 3)}`}>
               <div class="cc-media">
-                <img src={c.img} alt={c.t} loading="lazy" draggable="false" />
+                <img decoding="async" src={c.img} alt={c.t} loading="lazy" draggable="false" />
               </div>
               <div class="cc-body">
                 <h3>{c.t}</h3>
@@ -373,28 +420,28 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
         </div>
         <div class="gal" style="margin-top: clamp(2.5rem, 6vh, 4rem)">
           <div class="media w rv-img" data-par="0.08">
-            <img src="/img/cardio.jpg" alt="Zona de cardio con vista" loading="lazy" />
+            <img decoding="async" src="/img/cardio.jpg" alt="Zona de cardio con vista" loading="lazy" />
             <figcaption class="gal-cap">Cardio</figcaption>
             <Fragment set:html={stamp} />
           </div>
           <div class="media t rv-img" data-par="0.12" style="--d:1">
-            <img src="/img/sala-privada.jpg" alt="Sala privada de entrenamiento" loading="lazy" />
-            <figcaption class="gal-cap">Sala privada</figcaption>
+            <img decoding="async" src="/img/sala-privada.jpg" alt="Technogym Visio" loading="lazy" />
+            <figcaption class="gal-cap">Technogym Visio</figcaption>
           </div>
           <div class="media t rv-img" data-par="0.1">
-            <img src="/img/lamparas.jpg" alt="Doble altura con lámparas colgantes" loading="lazy" />
+            <img decoding="async" src="/img/lamparas.jpg" alt="Doble altura con lámparas colgantes" loading="lazy" />
             <figcaption class="gal-cap">Doble altura</figcaption>
           </div>
           <div class="media w rv-img" data-par="0.08" style="--d:1">
-            <img src="/img/site/espacio-6.jpg" alt="Terraza acristalada para clases" loading="lazy" />
+            <img decoding="async" src="/img/site/espacio-6.jpg" alt="Terraza acristalada para clases" loading="lazy" />
             <figcaption class="gal-cap">Terraza</figcaption>
           </div>
           <div class="media w rv-img" data-par="0.09">
-            <img src="/img/site/espacio-8.jpg" alt="Recepción bajo la doble altura" loading="lazy" />
+            <img decoding="async" src="/img/site/espacio-8.jpg" alt="Recepción bajo la doble altura" loading="lazy" />
             <figcaption class="gal-cap">Recepción</figcaption>
           </div>
           <div class="media t rv-img" data-par="0.12" style="--d:1">
-            <img src="/img/site/espacio-3.jpg" alt="Zona de peso integrado" loading="lazy" />
+            <img decoding="async" src="/img/site/espacio-3.jpg" alt="Zona de peso integrado" loading="lazy" />
             <figcaption class="gal-cap">Peso integrado</figcaption>
           </div>
         </div>
@@ -407,7 +454,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
           <div class="uni-cloud" id="uniCloud">
             {uniFotos.map((f) => (
               <figure class="uni-it" style={`--ux:${f.x}vw; --uy:${f.y}vh; --uz:${f.z}px; --uw:${f.w}rem; --ub:${f.b}s; --ua:${f.a}`}>
-                <img src={f.src} alt="" loading="lazy" />
+                <img decoding="async" src={f.src} alt="" loading="lazy" />
               </figure>
             ))}
           </div>
@@ -422,7 +469,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       <!-- ═══════ PILATES ═══════ -->
       <section class="sec split rev bg-bone" data-theme="light">
         <div class="media rv-img" data-par="0.1">
-          <img src="/img/terraza.jpg" alt="Contorno Pilates: el estudio acristalado sobre la ciudad" loading="lazy" />
+          <img decoding="async" src="/img/terraza.jpg" alt="Contorno Pilates: el estudio acristalado sobre la ciudad" loading="lazy" />
           <Fragment set:html={stamp} />
           </div>
         <div class="split-copy">
@@ -443,15 +490,15 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
 
           <div class="rec-grid">
             <div class="media rec-a rv-img" data-rv="wipel" data-par="0.1">
-              <img src="/img/sauna.jpg" alt="Sauna de madera" loading="lazy" />
+              <img decoding="async" src="/img/sauna.jpg" alt="Sauna de madera" loading="lazy" />
               <Fragment set:html={stamp} />
           </div>
             <!-- el logo llena el hueco sobre la imagen derecha -->
             <div class="rec-logo rv" style="--d:2" aria-hidden="true">
-              <img src="/img/logo-blanco.png" alt="" loading="lazy" />
+              <img decoding="async" src="/img/logo-blanco.png" alt="" loading="lazy" />
             </div>
             <div class="media rec-b rv-img" data-par="0.08" style="--d:1">
-              <img src="/img/spa.jpg" alt="Zona de spa y recuperación" loading="lazy" />
+              <img decoding="async" src="/img/spa.jpg" alt="Zona de spa y recuperación" loading="lazy" />
             </div>
 
             <div class="rec-list">
@@ -479,7 +526,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       <!-- ═══════ VESTIDORES ═══════ -->
       <section class="sec band" data-theme="dark">
         <div class="media rv-img" data-rv="wiper" data-fix style="--pos: 50% 58%">
-          <img src="/img/vestidores.jpg" alt="Vestidores de madera con lockers" loading="lazy" />
+          <img decoding="async" src="/img/vestidores.jpg" alt="Vestidores de madera con lockers" loading="lazy" />
           <Fragment set:html={stamp} />
           </div>
         <div class="band-cap">
@@ -494,7 +541,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
         <span class="split-vert rv" aria-hidden="true">DINAMO</span>
         <span class="split-iso rv" aria-hidden="true"><Fragment set:html={iso} /></span>
         <div class="media rv-img" data-par="0.1">
-          <img src="/img/coworking.jpg" alt="Zona de coworking del club" loading="lazy" />
+          <img decoding="async" src="/img/coworking.jpg" alt="Zona de coworking del club" loading="lazy" />
           <Fragment set:html={stamp} />
           </div>
         <div class="split-copy">
@@ -522,7 +569,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
 
           <!-- fila 2 · cuerpo: mockup / copy, a la misma altura -->
           <div class="media gold-shot rv-img" data-fix>
-            <img src="/img/site/journey-app.jpg" alt="Dinamo App: plan, histórico y reservas" loading="lazy" />
+            <img decoding="async" src="/img/site/journey-app.jpg" alt="Dinamo App: plan, histórico y reservas" loading="lazy" />
           </div>
           <div class="gold-copy">
             <p class="lede rv" style="--d:1">
@@ -549,26 +596,40 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
 
         <!-- banda de cierre a sangre: fuera del .wrap, que es quien limitaba el ancho -->
         <div class="media gold-band rv-img" data-fix>
-          <img src="/img/site/transformacion-tg.jpg" alt="Technogym Checkup y wellness age en la app" loading="lazy" />
+          <img decoding="async" src="/img/site/transformacion-tg.jpg" alt="Technogym Checkup y wellness age en la app" loading="lazy" />
           <span class="gold-band-iso" aria-hidden="true"><Fragment set:html={iso} /></span>
         </div>
       </section>
 
       <!-- ═══════ ECOSISTEMA ═══════ -->
-      <section class="sec ecofs bg-bone" id="ecosistema" data-theme="dark">
+      <section class="sec ecofs bg-ink" id="ecosistema" data-theme="dark">
         <!-- el titular vive DENTRO del contenedor de imágenes, sobre ellas -->
         <div class="ecofs-head">
           <div class="ecofs-t">
             <h2 class="display rv" data-lines style="--d:1">Marcas propias<br />dentro del club.</h2>
             <span class="ecofs-iso rv" style="--d:2" aria-hidden="true"><Fragment set:html={iso} /></span>
           </div>
-          <p class="small rv" style="--d:2">Nutrición, recuperación<br />y café de especialidad.</p>
+          <p class="small rv" style="--d:2">Recuperación, nutrición<br />y equipamiento DINAMO.</p>
         </div>
 
           <div class="eco">
             <article class="eco-card rv" data-rv="scale">
               <div class="media rv-img" data-par="0.08">
-                <img src="/img/lounge.jpg" alt="The Lab, shake bar de DINAMO" loading="lazy" />
+                <img decoding="async" src="/img/spa.jpg" alt="OASIS, área de wellness de DINAMO" loading="lazy" />
+              </div>
+              <div class="eco-body">
+                <h3>OASIS</h3>
+                <p class="small">Wellness</p>
+                <p class="lede">
+                  Contrastes, masaje, cámara hiperbárica y protocolos de
+                  longevidad. El área donde el cuerpo vuelve a su sitio.
+                </p>
+              </div>
+            </article>
+
+            <article class="eco-card rv" data-rv="scale" style="--d:1">
+              <div class="media rv-img" data-par="0.08">
+                <img decoding="async" src="/img/lounge.jpg" alt="the lab, shake bar de DINAMO" loading="lazy" />
               </div>
               <div class="eco-body">
                 <h3>the lab</h3>
@@ -580,76 +641,54 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
               </div>
             </article>
 
-            <article class="eco-card rv" data-rv="scale" style="--d:1">
-              <div class="media rv-img" data-par="0.08">
-                <img src="/img/spa.jpg" alt="Oasis, área de wellness de DINAMO" loading="lazy" />
-              </div>
-              <div class="eco-body">
-                <h3>Oasis</h3>
-                <p class="small">Wellness</p>
-                <p class="lede">
-                  Contrastes, masaje, cámara hiperbárica y protocolos de
-                  longevidad. El área donde el cuerpo vuelve a su sitio.
-                </p>
-              </div>
-            </article>
-
             <article class="eco-card rv" data-rv="scale" style="--d:2">
               <div class="media rv-img" data-par="0.08">
-                <img src="/img/coworking.jpg" alt="Latte Latte, café dentro del club" loading="lazy" />
+                <img decoding="async" src="/img/recepcion.jpg" alt="DINAMO Shop, tienda del club" loading="lazy" />
               </div>
               <div class="eco-body">
-                <h3>Latte Latte</h3>
-                <p class="small">Café de especialidad</p>
+                <h3>DINAMO Shop</h3>
+                <p class="small">Tienda</p>
                 <p class="lede">
-                  El punto de encuentro del club. Café, mesa de trabajo y la
-                  conversación que empieza después del entrenamiento.
+                  Ropa, accesorios y suplementos con la marca del club. Lo que
+                  necesitas para entrenar, sin salir de DINAMO.
                 </p>
               </div>
             </article>
           </div>
       </section>
 
-      <div class="bg-bone"><div class="wrap"><div class="rule rv"><svg class="mark" viewBox="0 0 1346 1152" aria-hidden="true"><rect x="2180" y="1339.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2563.5 1416)"/><rect x="2832" y="1588.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 3215.5 1665)"/><rect x="2137.4" y="1839.8" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2521 1916.5)"/></svg></div></div></div>
 
-      <!-- ═══════ MARCAS ALIADAS ═══════ -->
-      <div class="bg-bone">
-        <div class="wrap logos rv">
-          <p class="small">Con</p>
-          <img src="/img/site/technogym-logo.png" alt="Technogym" loading="lazy" />
-          <img src="/img/site/contorno-logo-dark.svg" alt="Contorno Pilates" loading="lazy" />
-          <img src="/img/site/lattelatte-logo-dark.png" alt="Latte Latte" loading="lazy" />
-        </div>
-      </div>
 
       <!-- ═══════ MEMBRESÍAS ═══════ -->
-      <section class="sec pad-y wrap bg-bone" id="membresias" data-theme="light">
+      <section class="sec dark pad-y bg-ink" id="membresias" data-theme="dark">
+       <div class="wrap">
         <div class="sec-mark rv"><Fragment set:html={iso} /></div>
         <h2 class="display rv" data-lines style="--d:1">Elige cómo quieres <em>vivirlo</em>.</h2>
 
         <div class="plans">
           <article class="plan rv" style="--d:1">
             <div class="plan-bg" aria-hidden="true" data-par="0.09">
-              <img src="/img/fachada-entrada.jpg" alt="" class="on" loading="lazy" />
-              <img src="/img/cardio.jpg" alt="" loading="lazy" />
-              <img src="/img/peso-libre.jpg" alt="" loading="lazy" />
-              <img src="/img/recepcion.jpg" alt="" loading="lazy" />
-              <img src="/img/maquinas.jpg" alt="" loading="lazy" />
-              <img src="/img/escaleras.jpg" alt="" loading="lazy" />
-              <img src="/img/funcional.jpg" alt="" loading="lazy" />
-              <img src="/img/technogym.jpg" alt="" loading="lazy" />
-              <img src="/img/gym-wide.jpg" alt="" loading="lazy" />
-              <img src="/img/rack.jpg" alt="" loading="lazy" />
-              <img src="/img/cardio-sala.jpg" alt="" loading="lazy" />
-              <img src="/img/lamparas.jpg" alt="" loading="lazy" />
-              <img src="/img/vestidores.jpg" alt="" loading="lazy" />
-              <img src="/img/lockers.jpg" alt="" loading="lazy" />
-              <img src="/img/training.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/fachada-entrada.jpg" alt="" class="on" loading="lazy" />
+              <img decoding="async" src="/img/cardio.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/peso-libre.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/recepcion.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/maquinas.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/escaleras.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/funcional.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/technogym.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/gym-wide.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/rack.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/cardio-sala.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/lamparas.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/vestidores.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/lockers.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/training.jpg" alt="" loading="lazy" />
             </div>
             <h3>Essential</h3>
             <p class="price">Consultar<small>Acceso libre</small></p>
             <ul>
               <li>Acceso a las tres plantas</li>
+              <li>Technogym Checkup inicial incluido</li>
               <li>Clases grupales incluidas</li>
               <li>Vestidores y amenidades</li>
               <li>App DINAMO</li>
@@ -658,28 +697,28 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
 
           <article class="plan feat rv" style="--d:2">
             <div class="plan-bg" aria-hidden="true" data-par="0.09">
-              <img src="/img/sauna.jpg" alt="" class="on" loading="lazy" />
-              <img src="/img/spa.jpg" alt="" loading="lazy" />
-              <img src="/img/terraza.jpg" alt="" loading="lazy" />
-              <img src="/img/coworking.jpg" alt="" loading="lazy" />
-              <img src="/img/pilates.jpg" alt="" loading="lazy" />
-              <img src="/img/sauna-detalle.jpg" alt="" loading="lazy" />
-              <img src="/img/lounge.jpg" alt="" loading="lazy" />
-              <img src="/img/battle-ropes.jpg" alt="" loading="lazy" />
-              <img src="/img/tocador.jpg" alt="" loading="lazy" />
-              <img src="/img/fachada-noche.jpg" alt="" loading="lazy" />
-              <img src="/img/medball.jpg" alt="" loading="lazy" />
-              <img src="/img/lavabos.jpg" alt="" loading="lazy" />
-              <img src="/img/situps.jpg" alt="" loading="lazy" />
-              <img src="/img/walk-light.jpg" alt="" loading="lazy" />
-              <img src="/img/rope-jump.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/sauna.jpg" alt="" class="on" loading="lazy" />
+              <img decoding="async" src="/img/spa.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/terraza.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/coworking.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/pilates.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/sauna-detalle.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/lounge.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/battle-ropes.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/tocador.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/fachada-noche.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/medball.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/lavabos.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/situps.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/walk-light.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/rope-jump.jpg" alt="" loading="lazy" />
             </div>
             <h3>Signature</h3>
             <p class="price">Consultar<small>La experiencia completa</small></p>
             <ul>
               <li>Todo lo de Essential</li>
               <li>Recovery: sauna e hiperbárica</li>
-              <li>Valoración y plan personalizado</li>
+              <li>Technogym Checkup y plan personalizado</li>
               <li>Acceso a coworking</li>
               <li>Invitados al mes</li>
             </ul>
@@ -687,36 +726,39 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
 
           <article class="plan rv" style="--d:3">
             <div class="plan-bg" aria-hidden="true" data-par="0.09">
-              <img src="/img/sala-privada.jpg" alt="" class="on" loading="lazy" />
-              <img src="/img/trainer.jpg" alt="" loading="lazy" />
-              <img src="/img/barbell-setup.jpg" alt="" loading="lazy" />
-              <img src="/img/rope-back.jpg" alt="" loading="lazy" />
-              <img src="/img/biostrength.jpg" alt="" loading="lazy" />
-              <img src="/img/deadlift.jpg" alt="" loading="lazy" />
-              <img src="/img/sprint.jpg" alt="" loading="lazy" />
-              <img src="/img/grip.jpg" alt="" loading="lazy" />
-              <img src="/img/portrait.jpg" alt="" loading="lazy" />
-              <img src="/img/runners.jpg" alt="" loading="lazy" />
-              <img src="/img/chalk-hands.jpg" alt="" loading="lazy" />
-              <img src="/img/gym-dark.jpg" alt="" loading="lazy" />
-              <img src="/img/situps2.jpg" alt="" loading="lazy" />
-              <img src="/img/chalk-plate.jpg" alt="" loading="lazy" />
-              <img src="/img/scream.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/sala-privada.jpg" alt="" class="on" loading="lazy" />
+              <img decoding="async" src="/img/trainer.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/barbell-setup.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/rope-back.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/biostrength.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/deadlift.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/sprint.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/grip.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/portrait.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/runners.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/chalk-hands.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/gym-dark.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/situps2.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/chalk-plate.jpg" alt="" loading="lazy" />
+              <img decoding="async" src="/img/scream.jpg" alt="" loading="lazy" />
             </div>
             <h3>Private</h3>
             <p class="price">Consultar<small>Uno a uno</small></p>
             <ul>
               <li>Entrenamiento personal</li>
+              <li>Technogym Checkup y seguimiento</li>
               <li>Seguimiento nutricional</li>
               <li>Sala privada por sesión</li>
               <li>Agenda prioritaria</li>
             </ul>
           </article>
         </div>
+       </div>
       </section>
 
       <!-- ═══════ PREGUNTAS ═══════ -->
-      <section class="sec pad-y wrap bg-bone" data-theme="light">
+      <section class="sec dark pad-y bg-ink" data-theme="dark">
+       <div class="wrap">
         <h2 class="display rv" data-lines style="--d:1">Preguntas<br /><em>frecuentes</em>.</h2>
         <div class="faq">
           <details class="faq-item rv">
@@ -729,7 +771,8 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
           <details class="faq-item rv" style="--d:1">
             <summary>¿La valoración inicial está incluida?</summary>
             <p class="lede">
-              En Signature y Private sí: evaluación física completa, objetivos y
+              Sí, en todas las membresías. El primer Technogym Checkup está
+              incluido: evaluación física completa, wellness age, objetivos y
               un plan diseñado por el equipo multidisciplinario.
             </p>
           </details>
@@ -748,6 +791,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
             </p>
           </details>
         </div>
+       </div>
       </section>
 
       <!-- ═══════ YOU VS YOU · cinética sobre amarillo ═══════ -->
@@ -803,9 +847,9 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
             ))}
           </ul>
           <div class="oasis-cards">
-            <figure class="ocard rv" data-tilt data-par="0.05"><img src="/img/oasis-contrastes.jpg" alt="Circuito de contrastes: cold plunge y sauna" loading="lazy" /></figure>
-            <figure class="ocard rv" data-tilt data-par="0.05" style="--d:1"><img src="/img/oasis-menu.jpg" alt="Servicios de OASIS" loading="lazy" /></figure>
-            <figure class="ocard rv" data-tilt data-par="0.05" style="--d:2"><img src="/img/oasis-recovery.jpg" alt="Circuito de recovery" loading="lazy" /></figure>
+            <figure class="ocard rv" data-tilt data-par="0.05"><img decoding="async" src="/img/oasis-contrastes.jpg" alt="Circuito de contrastes: cold plunge y sauna" loading="lazy" /></figure>
+            <figure class="ocard rv" data-tilt data-par="0.05" style="--d:1"><img decoding="async" src="/img/oasis-menu.jpg" alt="Servicios de OASIS" loading="lazy" /></figure>
+            <figure class="ocard rv" data-tilt data-par="0.05" style="--d:2"><img decoding="async" src="/img/oasis-recovery.jpg" alt="Circuito de recovery" loading="lazy" /></figure>
           </div>
         </div>
       </section>
@@ -813,7 +857,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
       <!-- ═══════ CTA ═══════ -->
       <section class="sec cta" id="contacto" data-theme="dark">
         <div class="media" data-fix>
-          <img src="/img/fachada-entrada.jpg" alt="" loading="lazy" />
+          <img decoding="async" src="/img/fachada-entrada.jpg" alt="" loading="lazy" />
         </div>
         <div class="cta-inner">
           <div class="sec-mark rv"><Fragment set:html={iso} /></div>
@@ -834,7 +878,7 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
         <canvas id="tideGl" aria-hidden="true"></canvas>
         <div class="tide-inner">
           <p class="tide-kicker rv">You vs You</p>
-          <img class="tide-logo rv" src="/img/logo-slogan-iso-amarillo.png"
+          <img decoding="async" class="tide-logo rv" src="/img/logo-slogan-iso-amarillo.png"
                alt="DINAMO — You vs You" loading="lazy" />
         </div>
       </section>
@@ -890,8 +934,8 @@ const stamp = `<span class="stamp" aria-hidden="true">${iso}<b>DINAMO</b></span>
         <div class="wrap">
           <div class="ft-row">
             <a class="ft-mark" href="#hero" aria-label="DINAMO — inicio">
-              <Fragment set:html={iso} />
               <b>DINAMO</b>
+              <Fragment set:html={iso} />
             </a>
 
             <nav class="ft-nav">

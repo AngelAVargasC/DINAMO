@@ -1,5 +1,291 @@
 # Bitácora — DINAMO
 
+## 2026-09-18 — Observaciones de Enrique (cliente) por WhatsApp
+
+Enrique revisó el sitio publicado y mandó estas correcciones. Se anotan
+**todas antes de tocar nada**, para poder comprobar al final que ninguna
+quedó fuera. Estado: `[x]` hecho · `[ ]` pendiente.
+
+### Lista de cambios solicitados
+
+1. `[x]` **«Ese no es el logo».** *Aclaración posterior de Angel:* Enrique se
+   refería al **orden del lockup horizontal**: DINAMO usa oficialmente la
+   palabra con el isotipo (tres barras) **a la derecha** («DINAMO ⫽», portada
+   del brandbook), no a la izquierda como iba en la web. Corregido en la
+   cabecera (`.hd-logo`), el sello de las fotos (`stamp`) y el pie
+   (`.ft-mark`). El logo vertical (isotipo arriba, palabra debajo) y el
+   `og.jpg` ya eran los oficiales. Lo de abajo (la tarjeta de WhatsApp) sigue
+   siendo cierto y también quedó hecho. La tarjeta de previsualización al compartir
+   el enlace por WhatsApp mostraba un logo inventado (dos barras + DINAMO
+   sobre triángulo amarillo). Causa: la página no tenía `og:image` ni
+   metadatos sociales (pendiente desde sesiones anteriores), así que WhatsApp
+   generó la tarjeta por su cuenta. Hecho: `web/public/og.jpg` (1200×630,
+   logo oficial con eslogan en blanco e isotipo amarillo sobre negro de marca,
+   29 KB) + etiquetas `og:*` y `twitter:*` en el `<head>` de `index.astro`.
+   La URL es absoluta y sale de `site` en `astro.config.mjs` → ver «abierto».
+2. `[x]` **Foto «Sala privada» está mal etiquetada:** debe ser **TECHNOGYM
+   VISIO**. Hecho: pie y `alt` de `sala-privada.jpg` en la galería de «El
+   espacio». (El archivo conserva su nombre; el ítem «Sala privada por
+   sesión» de la membresía Private es un servicio, no la foto, y se queda.)
+3. `[x]` **«Marcas propias dentro del club»:** quitar Technogym, Contorno y
+   Latte Latte y poner **OASIS, THE LAB y DINAMO SHOP**. Hecho: la fila de
+   logos aliados («Con Technogym · Contorno · Latte Latte») se eliminó; las
+   tres tarjetas son ahora OASIS, the lab y DINAMO Shop, en ese orden. La de
+   DINAMO Shop usa `recepcion.jpg` y un texto provisional («ropa, accesorios
+   y suplementos») **a falta de foto y descripción reales de la tienda**.
+   Subtítulo: «Recuperación, nutrición y equipamiento DINAMO».
+4. `[x]` **Más fondos oscuros, menos blanco.** Los textos amarillos sobre
+   fondo blanco son problemáticos (contraste). Hecho con criterio, no en
+   bloque (Angel pidió justificarlo por el usuario). Análisis y decisiones:
+
+   **Regla de contraste.** `#FFE700` sobre hueso `#F4F1EC` da 1.2:1 de
+   contraste (WCAG pide 3:1 en titulares grandes): ilegible para cualquiera.
+   Sobre tinta `#14130F` da 15:1. Por eso el amarillo **sólo pinta texto
+   sobre fondo oscuro**; en secciones claras el énfasis del titular
+   (`<em>`) va en tinta y lo distingue el peso 500. Regla CSS global
+   `[data-theme="light"] .display em`, afecta a hero («transforms»),
+   manifiesto («fitness»), timeline («Conecta») y El espacio («inspira»).
+   Antes había 7 titulares con amarillo sobre hueso; ahora 0.
+
+   **Qué sección va en oscuro y por qué (lectura de lo que hace el
+   visitante en cada tramo):**
+   - Technogym (split) → **tinta**. Contenido de rendimiento y tecnología,
+     foto de sala oscura; en claro la foto flotaba y el «alto rendimiento»
+     era amarillo sobre hueso. En oscuro la sección se lee como la marca
+     Technogym (negro) y el amarillo recupera su función.
+   - Conceptos (carrusel de 8) → **tinta**. Es un tramo de *exploración*
+     (arrastrar, mirar fotos): las tarjetas ya eran oscuras con velo, y
+     sobre hueso parecían recortes pegados. Sobre tinta flotan las fotos y
+     el ojo va a ellas. Flechas del carrusel adaptadas (`.dark .cc-arrow`).
+   - Marcas propias → fondo **tinta** (era hueso bajo las fotos): evita el
+     filete claro bajo las tarjetas.
+   - Membresías y Preguntas → **tinta** (ya en esta sesión). Son el tramo
+     de *decisión*: comparar planes y resolver dudas antes del CTA; el
+     oscuro concentra y aísla del resto del recorrido, y enlaza sin corte
+     con YOU VS YOU (amarillo) y el cierre oscuro.
+   - Hero, Manifiesto, Todo lo que necesitas, timeline «Entrena. Recupérate.
+     Conecta.», El espacio, «Equilibrio bajo la luz» → **siguen en claro**.
+     Son tramos de *lectura* (párrafos, listas horarias) o de *arquitectura*
+     (interiores claros, madera, luz natural, «bajo la luz» literal): el
+     hueso da descanso ocular y el gimnasio no parece un búnker. Sin ellos
+     el amarillo deja de destacar, porque destaca por contraste con el negro
+     **y** por escasez.
+
+   **Ritmo resultante** (L claro · D oscuro · G amarillo): L L D D D L **D**
+   L **D** L D L D D · G · D D D G · lab · oasis · D. Antes había seis
+   claras seguidas en el centro; ahora alternan. Cuota oscura ≈ 60 %
+   (antes ≈ 45 %).
+
+   **Fondos a sangre, sin filetes claros (Angel, con capturas).** Membresías
+   y Preguntas tenían `wrap` en el propio `<section>`: el negro sólo cubría
+   el ancho del contenedor y el hueso del body asomaba a los lados y arriba.
+   El `wrap` pasa a un `div` interior. Y el separador con isotipo (`.rule`)
+   entre marcas propias y membresías **se eliminó**: sus márgenes
+   descubrían el hueso del body como dos franjas claras sin función entre
+   dos secciones negras.
+
+   Verificado en navegador a 1500 px: hero, Technogym, timeline, Conceptos,
+   marcas propias → membresías, Preguntas → YOU VS YOU.
+
+5. `[x]` **Usar las líneas superpuestas del brandbook** (barras amarillas
+   diagonales, con degradado, sobre foto en blanco y negro; portada del
+   brandbook como referencia). Hecho: componente `.bars` (CSS puro, dos `<i>`
+   a 45° con degradado a transparente, entran deslizándose por su eje al
+   hacer scroll) en la sección YOU VS YOU («La única competencia eres tú»),
+   esquina superior izquierda, sin tapar el titular. Verificado en navegador.
+   Reutilizable en cualquier sección `position: relative` con
+   `<div class="bars rv" data-rv="bars"><i></i><i></i></div>`.
+6. `[ ]` **Membresías («Elige cómo quieres vivirlo»):** nombres correctos
+   (Montserrat los pasa; los actuales Essential / Signature / Private son
+   provisionales), características reales y **fotos que ilustren cada
+   membresía**. Enrique dijo «mando aquí la info de membresías al día de hoy»
+   pero esa info **no llegó en las capturas** → pedirla a Angel.
+7. `[x]` **«Valoración inicial»:** añadir **«Technogym checkup»**, y dejar
+   claro que **el primer checkup está incluido en todas las membresías**.
+   Hecho: la FAQ «¿La valoración inicial está incluida?» responde «Sí, en
+   todas las membresías. El primer Technogym Checkup está incluido…», y las
+   tres tarjetas de membresía llevan una línea con Technogym Checkup
+   (Essential: «Technogym Checkup inicial incluido»).
+
+### Transiciones de fondo: probadas y descartadas
+
+Angel pidió que los cambios de fondo fueran «transicionados, no colores
+fijos». Se implementó un sistema de **costuras ligadas al scroll** (bloque
+del color de una sección avanzando sobre el relleno de la vecina con borde
+diagonal, progreso escrito por `ui.ts` según la posición en pantalla, sin
+fundido por tiempo). Angel lo vio y lo **descartó**: las cuñas diagonales
+a medio recorrido se veían como formas deformes. Se eliminó entero (HTML,
+CSS y script; no queda rastro de `seam`).
+
+**Decisión vigente, por tercera vez:** los fondos cambian con **corte
+limpio en el borde de la sección**. Ni fundido por tiempo (sesiones
+anteriores), ni degradado en el borde (sistema `.fade`, eliminado), ni
+costura geométrica (hoy). No volver a proponerlo.
+
+### Rendimiento: scroll sin bajones
+
+Angel pidió «máximo rendimiento, que no se sienta lageado ni con bajones de
+fps». Se midió antes y después con un recorrido automático de arriba abajo
+(28 px por frame, ~965 frames, 1500 px de ancho), registrando la duración de
+cada frame. Primera pasada en frío (caché vacía) y pasadas en caliente.
+
+| Recorrido en frío | Antes | Después |
+|---|---|---|
+| Frames > 25 ms | 24 | 2 |
+| Frames > 50 ms | 2 | 0 |
+| p99 | 37,6 ms | 20,8 ms |
+| Peor frame | 70,8 ms | 29,1 ms |
+
+En caliente no había bajones ni antes ni después (p95 ≈ 12 ms, con o sin los
+cambios: es el techo de este equipo, no del sitio). **Los bajones eran de
+frío**: descodificar fotos de 2000–2400 px al entrar en pantalla y, sobre
+todo, remedir todo el layout con cada foto diferida que cargaba.
+
+**Qué se cambió (y por qué):**
+- `ui.ts`, medición: antes **cada `<img>` al cargar lanzaba `measureAll()`**
+  (cientos de `offsetTop` en pleno scroll: 86 fotos diferidas → 86 mediciones
+  completas). Ahora sólo miden resize, fuentes, `load` y el
+  `ResizeObserver` cuando cambia el alto del documento, agrupados en un frame
+  (`requestMeasure`). Es la causa principal de la mejora en frío.
+- `ui.ts`, bucle: parallax (`data-par`), ventana (`data-fix`), cinéticas,
+  cruz, universo, contadores, carrusel y franja ya **no llaman
+  `getBoundingClientRect` por elemento y frame**: su geometría se cachea en
+  `measureAll` y por frame sólo se resta el scroll. Antes se alternaban
+  lecturas de layout y escrituras de estilo (layout thrashing). Los
+  contadores hacían `absTop()` (recorrido de `offsetParent`) por frame.
+- `ui.ts`, bucle en reposo: si el scroll no cambió y no hay medición nueva,
+  se saltan todos los `sync` atados al scroll (`moved`). Sólo siguen los que
+  van por tiempo (universo amortiguado, deriva del carrusel, franja, tour).
+- CSS, capas de GPU: `.media img` y `.plan-bg img` tenían
+  `translate3d` + `will-change: transform` **siempre**: ~80 fotos del club
+  y 45 fondos de membresía promovidos a capa con su textura, fuera de
+  pantalla incluidos. Ahora el transform es 2D y sin `will-change`; la clase
+  `.par-on` (la pone `syncPars` exactamente en el rango en que escribe
+  `--py`, ±200 px del viewport) promueve la foto mientras se mueve y la
+  libera al salir. Sin repintados sin capa, sin capas de más. A/B medido:
+  mismo coste en caliente que las capas permanentes, y mucha menos memoria
+  de GPU (importa en móvil/portátil, no en este PC).
+- CSS, trabajo fuera de vista: `IntersectionObserver` pone `.vis` en hero,
+  universo, marcas propias, OASIS y la cruz. Fuera de vista se pausan las
+  animaciones infinitas (aurora de OASIS, zoom de las tarjetas de marcas) y
+  la nube 3D del universo (45 figuras) va con `content-visibility: hidden`.
+- HTML: `decoding="async"` en las 87 imágenes (la descodificación no bloquea
+  el hilo principal al entrar en pantalla).
+- Fotos: 72 JPEG recomprimidos (tope 1800 px de lado mayor, calidad 80,
+  progresivo): 16,4 → 12,6 MB. Copia de los originales en el scratchpad de
+  esta sesión; la fuente sigue en `brand/`. `img/uni/` (ya ligeras) y los PNG
+  no se tocaron.
+
+**Validado y no hay que volver a revisar:** sin errores de consola; galería
+de El espacio, universo (secuencia de tres actos intacta) y membresías se
+ven igual que antes; `npm run build` OK.
+
+**Marcas propias, hover a tirones (captura de Angel).** La tarjeta se
+expande animando `flex-grow` (0.9 s). El coste no era el layout de tres
+cajas, sino que la foto (`object-fit: cover` al 100 % del ancho) y el velo
+degradado (`::after`) se re-encajaban y **repintaban en cada frame**, tres
+fotos grandes a la vez, con el zoom infinito y el parallax encima. Arreglo
+sin cambiar el gesto: `.eco-card .media` y `::after` miden siempre el ancho
+de la tarjeta expandida (62 vw = 3.2/5.2 de la fila) y van centrados
+(`inset: 0 auto 0 50%; margin-left: -31vw`); al animar, la tarjeta sólo
+cambia el recorte sobre una imagen ya rasterizada. El encuadre en reposo no
+cambia: con estas proporciones (foto 3:2 en caja de ~700 px de alto) la
+escala la fija la altura tanto a 33 vw como a 62 vw. En columna (≤ 900 px)
+vuelven a `inset: 0; width: auto`. Geometría verificada por script (media de
+1059 px centrada en tarjetas de 564 px a 1707 px de ancho). **La medición de
+fps del hover no se pudo hacer**: la pestaña de Chrome quedó en segundo
+plano y el navegador no ejecuta frames ahí. Angel lo comprueba a mano.
+
+**Carrusel de Conceptos: el hover ya no detiene nada (Angel).** La deriva
+automática se pausaba con el cursor encima y con el foco; se quitó. Sigue
+parando sólo mientras se arrastra y 3,5 s tras un gesto explícito (flechas,
+rueda, táctil), para no pelear con la mano del usuario.
+
+**Collage en cruz en móvil (captura de Angel, iPhone).** Las piezas salían
+diminutas y sueltas porque la regla móvil `.cross-t { grid-area: auto }`
+pesaba menos que las áreas de escritorio (`.cross .t1 { grid-area: … }`) y
+nunca se aplicaba: las fotos seguían ancladas a celdas de una retícula de 12
+columnas que ya no existía. Se anula con la misma especificidad
+(`.cross .cross-t`) y se recompone a 2 columnas con `grid-auto-flow: dense`:
+recepción a sangre → máquinas | cardio a media anchura → terraza a sangre →
+vestidores a sangre; las tres flotantes con marco siguen ocultas. Verificado
+por geometría en un iframe de 400 px (sin huecos: 360×186, 175×186 ×2,
+360×186, 360×186). **Móvil sigue sin probarse en dispositivo real** más allá
+de esta sección; conviene que Angel recorra la página entera en el iPhone.
+
+**Portada del brandbook en YOU VS YOU y hero en negro (Angel).**
+- **YOU VS YOU («La única competencia eres tú»)**: fuera la foto del chico y
+  la chica (`que-es-dinamo.jpg`, queda en `public/img/site` sin usar). Entra
+  el velocista de la portada del brandbook, extraído a resolución completa
+  del PDF (`public/img/site/sprinter-brandbook.jpg`, 1540×966, fondo negro
+  puro). La sección recrea la portada: fondo `#000`, velocista a la derecha
+  (`object-position: 68% 60%`), dos barras grandes blanco→amarillo arriba a
+  la izquierda (las `.bars` ya existentes, ahora más grandes y con la cola en
+  blanco como en la portada), seis carriles verticales (`.creed::before`) y
+  el texto abajo a la derecha, donde la portada lleva el logo. En móvil el
+  texto va abajo a la izquierda. Velo reducido a un cierre leve inferior.
+- **Hero**: se pasó a negro y **Angel lo devolvió a blanco** en la misma
+  sesión: sobre negro se ven los cantos del recorte de la atleta
+  (`atleta-light.png`). Revertido todo (fondo, tipografía, capas, lecho,
+  aurora del shader, opacidad del isotipo 3D y color inicial de la
+  cabecera); `hero-gl.ts` queda idéntico al original. **Decisión: el hero es
+  blanco.** Si algún día se quiere negro, hace falta otro recorte de la
+  figura (o una foto con fondo negro real, como la del velocista).
+- YOU VS YOU verificado sólo por DOM (foto cargada, reveal abierto,
+  barras y texto en posición): la pestaña de Chrome quedó oculta antes de
+  poder capturar el estado final. **Angel: mirar YOU VS YOU** (encuadre del
+  velocista y carriles).
+- Ajuste posterior: el isotipo de la sección iba encima del titular y caía
+  sobre el cuerpo del velocista (se perdían barras). Ahora cierra el bloque
+  **abajo a la derecha**, bajo «You vs You», más pequeño (`.creed-mark`).
+  Angel seguía viendo «dos barras»: no era recorte (las tres están dentro
+  del viewBox, comprobado por geometría) sino tamaño: las dos barras de la
+  izquierda comparten diagonal con un hueco de ~9 % del alto y a 38 px el
+  antialias las funde. **Regla: el isotipo nunca por debajo de ~3.2 rem**
+  (≈ 50 px); en la cabecera y el sello ya está en ese límite.
+- **Las barras grandes de la esquina eran dos; el isotipo son tres** (Angel:
+  «corrige el logo de la esquina superior izquierda»). En la portada lo que
+  hay ahí es el isotipo completo a gran escala. El componente `.bars` ya no
+  usa dos `<i>` sueltos: es el SVG del isotipo (mismos `rect` del logo, o
+  sea proporciones oficiales) a 46 vw, cortado por el borde izquierdo, con
+  un `linearGradient` en unidades de la caja de cada rect: la cola inferior
+  izquierda de cada barra se funde a blanco, como en la portada. Entrada por
+  opacidad escalonada. Verificado sólo por geometría (pestaña oculta).
+
+**Ideas que quedan si hiciera falta más:** bajar el tope a 1600 px en las
+fotos que nunca van a sangre (las de tarjetas y mitades); `srcset` por
+tamaño; convertir a WebP/AVIF (~30–40 % menos peso, requiere `<picture>`).
+El `CLAUDE.md` menciona `src/scripts/gl.ts`, que no existe (el hero ya no
+usa WebGL a mano); conviene actualizarlo.
+
+### Qué quedó abierto
+
+- **Dominio real para `og:image`.** `site` en `astro.config.mjs` es
+  `https://dinamo.mx`, pero ese dominio es de otra empresa (redirige a
+  dinamo.agency). Hasta que `site` apunte al dominio real (el de Railway o el
+  definitivo), WhatsApp no podrá cargar `og.jpg` y mostrará la tarjeta sin
+  imagen (nunca más el logo falso). Angel: cambiar `site` y volver a
+  desplegar.
+- WhatsApp cachea la previsualización: tras el deploy hay que compartir el
+  enlace con un parámetro nuevo (`?v=2`) o esperar a que expire la caché.
+- **Punto 6 (membresías) sin hacer**: la info de membresías no está en el
+  chat capturado. Angel: pasar nombres, características y qué foto ilustra
+  cada una. Las tarjetas ya están preparadas para ello (`.plan-bg` rota
+  fotos; basta cambiar la lista de `<img>`).
+- **Punto 4**: si Enrique quiere aún más oscuro, las candidatas siguientes
+  son «Todo lo que necesitas» (lista con fotos al hover) y El espacio
+  (galería); las de lectura larga (manifiesto, timeline) deberían seguir
+  claras.
+- **DINAMO Shop**: falta foto y texto reales (hoy `recepcion.jpg` y texto
+  genérico).
+- Sitio construido y verificado en navegador (`npm run build` OK; secciones
+  YOU VS YOU, marcas propias, membresías y FAQ revisadas a 1500 px). Móvil
+  sin probar en dispositivo.
+
+### Sugerencia de commit
+
+`Correcciones de Enrique: og:image con logo oficial, Technogym Visio, marcas propias, checkup en membresías, fondos oscuros y barras del brandbook`
+
 ## 2026-09-04 — Preparación para deploy en Railway vía GitHub
 
 ### Qué se hizo
