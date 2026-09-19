@@ -52,12 +52,13 @@ const uniFotos = [
   };
 });
 
+// Servicios de OASIS según el brief de marca (Wellness · Recovery ·
+// Longevity son territorios, no servicios). Sin promesas médicas.
 const oasisServicios = [
-  { n: "01", t: "CONTRASTES", d: "Cold plunge · Sauna" },
-  { n: "02", t: "MASAJES", d: "Descarga y recuperación" },
-  { n: "03", t: "CÁMARA HIPERBÁRICA", d: "Oxigenación profunda" },
-  { n: "04", t: "LONGEVITY", d: "Protocolos de largo plazo" },
-  { n: "05", t: "TERAPIA DE COMPRESIÓN", d: "Circulación y drenaje" },
+  { n: "01", t: "CONTRAST THERAPY", d: "Calor y frío en circuitos privados y semiprivados" },
+  { n: "02", t: "MASSAGE THERAPY", d: "Relajante · Deportivo · Descontracturante · Drenaje linfático" },
+  { n: "03", t: "CÁMARA HIPERBÁRICA", d: "Sesiones de recuperación con oxígeno a presión" },
+  { n: "04", t: "COMPRESSION THERAPY", d: "Botas de compresión para piernas: recuperación y relajación" },
 ];
 
 const iso = `<svg viewBox="0 0 1346 1152" aria-hidden="true"><g fill="currentColor"><rect x="2180" y="1339.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2563.5 1416)"/><rect x="2832" y="1588.3" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 3215.5 1665)"/><rect x="2137.4" y="1839.8" width="767" height="153.4" transform="translate(-2196 -1091) rotate(-45 2521 1916.5)"/></g></svg>`;
@@ -626,8 +627,8 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
                 <h3>OASIS</h3>
                 <p class="small">Wellness</p>
                 <p class="lede">
-                  Contrastes, masaje, cámara hiperbárica y protocolos de
-                  longevidad. El área donde el cuerpo vuelve a su sitio.
+                  Wellness, recovery y longevidad: contrast therapy, masajes,
+                  cámara hiperbárica y compresión. Train at DINAMO, recover at OASIS.
                 </p>
               </div>
             </article>
@@ -638,24 +639,24 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
               </div>
               <div class="eco-body">
                 <h3>the lab</h3>
-                <p class="small">Shake bar</p>
+                <p class="small">Performance nutrition</p>
                 <p class="lede">
-                  Nutrición con método: proteína, recuperación y energía medidas
-                  al gramo para acompañar cada sesión.
+                  Science behind every shake: cada receta parte de un objetivo
+                  (Build, Recover, Fuel, Hydrate) con macros a la vista.
                 </p>
               </div>
             </article>
 
             <article class="eco-card rv" data-rv="scale" style="--d:2">
               <div class="media rv-img" data-par="0.08">
-                <img decoding="async" src="/img/recepcion.jpg" alt="DINAMO Shop, tienda del club" loading="lazy" />
+                <img decoding="async" src="/img/recepcion.jpg" alt="the shop, tienda de suplementos del club" loading="lazy" />
               </div>
               <div class="eco-body">
-                <h3>DINAMO Shop</h3>
-                <p class="small">Tienda</p>
+                <h3 class="eco-logo"><img decoding="async" src="/img/site/theshop-logo.png" alt="the shop @DINAMO" loading="lazy" /></h3>
+                <p class="small">Suplementos</p>
                 <p class="lede">
-                  Ropa, accesorios y suplementos con la marca del club. Lo que
-                  necesitas para entrenar, sin salir de DINAMO.
+                  Pre-entrenos, proteína y bebidas de las marcas que ya usas,
+                  a pie de sala: Ryse, C4, Ghost, Dymatize y Monster.
                 </p>
               </div>
             </article>
@@ -857,32 +858,63 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
       </section>
 
       <!-- ═══════ THE LAB ═══════ -->
+      <!-- the lab según el brief de marca (DINAMO OASIS T.LAB.docx): performance
+           nutrition, no shake bar. Tagline oficial SCIENCE BEHIND EVERY SHAKE;
+           shakes por objetivo (Build / Recover / Fuel / Hydrate, nomenclatura
+           que «podrá evolucionar»); macros visibles; add-ons funcionales. -->
       <section class="sec thelab" id="thelab" data-theme="lab">
         <div class="lab-lines" aria-hidden="true"></div>
         <div class="wrap">
           <h2 class="lab-word rv" style="--d:1">the lab</h2>
-          <p class="lab-sub rv" style="--d:2">SHAKE&nbsp;BAR&nbsp;&nbsp;·&nbsp;&nbsp;BY&nbsp;DINAMO</p>
+          <p class="lab-sub rv" style="--d:2">PERFORMANCE&nbsp;NUTRITION&nbsp;&nbsp;·&nbsp;&nbsp;SCIENCE&nbsp;BEHIND&nbsp;EVERY&nbsp;SHAKE</p>
           <p class="lab-copy rv" style="--d:3">
-            Nutrición con método. Shakes formulados con precisión de
-            laboratorio para acompañar tu entrenamiento: proteína, recuperación
-            y energía, medidas al gramo.
+            Real ingredients. Specific purpose. Cada shake empieza por una
+            pregunta: ¿qué queremos que haga? De ahí salen su receta, sus
+            ingredientes y su perfil nutricional. Recetas exclusivas de DINAMO:
+            no las encuentras en ningún otro lugar de México.
           </p>
-          <div class="lab-chips">
-            <span class="chip c2 rv">PROTEÍNA</span>
-            <span class="chip c4 rv" style="--d:1">RECUPERACIÓN</span>
-            <span class="chip c3 rv" style="--d:2">ENERGÍA</span>
+
+          <ul class="lab-goals">
+            <li class="lab-goal rv" data-rv="scale">
+              <b>Build</b>
+              <span>Proteína y nutrición para desarrollo y recuperación muscular.</span>
+            </li>
+            <li class="lab-goal rv" data-rv="scale" style="--d:1">
+              <b>Recover</b>
+              <span>Lo que el cuerpo pide después de entrenar.</span>
+            </li>
+            <li class="lab-goal rv" data-rv="scale" style="--d:2">
+              <b>Fuel</b>
+              <span>Energía y carbohidratos disponibles alrededor del entrenamiento.</span>
+            </li>
+            <li class="lab-goal rv" data-rv="scale" style="--d:3">
+              <b>Hydrate</b>
+              <span>Hidratación y reposición de electrolitos.</span>
+            </li>
+          </ul>
+
+          <div class="lab-facts rv" style="--d:2">
+            <p class="lab-macros"><b>Protein</b><i>/</i><b>Carbs</b><i>/</i><b>Fat</b><i>/</i><b>Calories</b><small>visibles en cada shake</small></p>
+            <div class="lab-chips">
+              <span class="lab-chips-l">Add-ons</span>
+              <span class="chip c2 rv">CREATINE 5 g</span>
+              <span class="chip c3 rv" style="--d:1">PROBIOTICS</span>
+              <span class="chip c4 rv" style="--d:2">TART CHERRY</span>
+              <span class="chip c3 rv" style="--d:3">ELECTROLYTES</span>
+              <span class="chip c2 rv" style="--d:4">EXTRA PROTEIN</span>
+            </div>
           </div>
         </div>
         <div class="lab-marquee" aria-hidden="true">
-          <p class="lab-mrow" data-dir="1">SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;</p>
-          <p class="lab-mrow pink" data-dir="-1">SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE IN EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;</p>
+          <p class="lab-mrow" data-dir="1">SCIENCE BEHIND EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE BEHIND EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;SCIENCE BEHIND EVERY SHAKE&nbsp;&nbsp;—&nbsp;&nbsp;</p>
+          <p class="lab-mrow pink" data-dir="-1">REAL INGREDIENTS. SPECIFIC PURPOSE.&nbsp;&nbsp;—&nbsp;&nbsp;REAL INGREDIENTS. SPECIFIC PURPOSE.&nbsp;&nbsp;—&nbsp;&nbsp;REAL INGREDIENTS. SPECIFIC PURPOSE.&nbsp;&nbsp;—&nbsp;&nbsp;</p>
         </div>
       </section>
 
       <!-- ═══════ OASIS ═══════ -->
       <section class="sec oasis" id="oasis" data-theme="dark">
         <div class="oasis-aurora" aria-hidden="true"></div>
-        <p class="oasis-vertical" aria-hidden="true">TRAIN&nbsp;&nbsp;·&nbsp;&nbsp;RECOVER&nbsp;&nbsp;·&nbsp;&nbsp;CONNECT</p>
+        <p class="oasis-vertical" aria-hidden="true">TRAIN&nbsp;&nbsp;·&nbsp;&nbsp;RECOVER&nbsp;&nbsp;·&nbsp;&nbsp;FUEL</p>
         <div class="wrap">
           <h2 class="oasis-word rv" style="--d:1">OASIS</h2>
           <p class="oasis-sub rv" style="--d:2">WELLNESS&nbsp;BY&nbsp;&nbsp;<b>DINAMO</b></p>

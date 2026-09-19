@@ -1521,6 +1521,8 @@ html.menu-lock { overflow: hidden; }
   font-size: 0.58rem;
   font-weight: 600;
 }
+/* logotipo oficial de the shop (del .ai de Enrique, PNG en hueso) en vez del nombre */
+.eco-body .eco-logo img { display: block; height: clamp(2rem, 3.2vw, 3rem); width: auto; }
 .eco-body .lede { margin-top: 0.9rem; font-size: 0.85rem; color: rgba(244, 241, 236, 0.82); }
 .eco-body .small { color: rgba(244, 241, 236, 0.6); }
 @media (max-width: 900px) {
@@ -2295,7 +2297,54 @@ html.menu-lock { overflow: hidden; }
   font-weight: 340;
   color: #cfc3e4;
 }
-.lab-chips { margin-top: clamp(2rem, 5vh, 3rem); display: flex; flex-wrap: wrap; gap: 0.8rem; }
+/* shakes por objetivo: cuatro fichas con lenguaje de laboratorio */
+.lab-goals {
+  list-style: none;
+  margin-top: clamp(2.2rem, 5vh, 3.4rem);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+}
+.lab-goal {
+  padding: clamp(1rem, 1.8vw, 1.5rem);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+.lab-goal b {
+  font-weight: 640;
+  font-stretch: 108%;
+  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+  line-height: 1;
+  color: #fff;
+}
+.lab-goal span { font-size: 0.8rem; line-height: 1.55; font-weight: 340; color: #cfc3e4; }
+.lab-goal:nth-child(1) b { color: var(--lab-pink); }
+.lab-facts {
+  margin-top: clamp(1.8rem, 4vh, 2.6rem);
+  display: grid;
+  gap: 1.2rem;
+}
+.lab-macros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.6rem;
+  font-size: clamp(0.8rem, 1.3vw, 1rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #fff;
+}
+.lab-macros i { font-style: normal; font-weight: 300; color: #b9a8d6; }
+.lab-macros small { margin-left: 0.6rem; letter-spacing: 0.08em; text-transform: none; font-weight: 400; font-size: 0.72rem; color: #b9a8d6; }
+.lab-chips-l { align-self: center; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: #b9a8d6; margin-right: 0.4rem; }
+@media (max-width: 900px) { .lab-goals { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .lab-goals { grid-template-columns: 1fr; } }
+.lab-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
 .chip {
   border-radius: 999px;
   font-family: inherit;

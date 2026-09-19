@@ -297,6 +297,64 @@ desde 345. Nada se toca.
   `touch` del archivo lo arregló. Si un cambio de marcado no aparece y los
   de estilo sí, es esto: reiniciar el dev o volver a guardar el archivo.
 
+**Brief de marca «DINAMO OASIS T.LAB.docx» (en `brand/`) contrastado con la
+web.** Es el brief oficial: tres conceptos, DÍNAMO = Train, OASIS = Recover,
+THE LAB = Fuel; «menos adjetivos, más evidencia». Hallazgos y **lo que se
+aplicó** (Angel: «sí, hazlo»):
+- **Aplicado:** tagline oficial «SCIENCE BEHIND EVERY SHAKE» (marquesina y
+  subtítulo); cabecera vertical de OASIS «TRAIN · RECOVER · FUEL»; servicios
+  de OASIS reescritos según el brief (Contrast therapy privado/semiprivado,
+  Massage therapy con los cuatro tipos, cámara hiperbárica sin promesas
+  médicas, Compression therapy para piernas; «Longevity» ya no es servicio);
+  **sección the lab rehecha** como performance nutrition: copy «Real
+  ingredients. Specific purpose.» + recetas exclusivas, cuatro fichas por
+  objetivo (Build / Recover / Fuel / Hydrate, `.lab-goals`), línea de macros
+  Protein / Carbs / Fat / Calories, add-ons (Creatine 5 g, Probiotics, Tart
+  cherry, Electrolytes, Extra protein) y segunda marquesina «REAL
+  INGREDIENTS. SPECIFIC PURPOSE.»; tarjetas de marcas propias de the lab
+  (ya no «Shake bar») y OASIS (tres territorios, «Train at DINAMO, recover
+  at OASIS»). Verificado en captura a 1500 px.
+- **Sin aplicar, a decidir con Montserrat/Enrique:** OASIS «by DINAMO» y su
+  estado de preapertura (lista prioritaria, fundadores); la duplicidad
+  Recovery/OASIS; «Ocho formas de entrenar»; DÍNAMO SOCIAL, convenios y
+  protocolos combinados. Detalle:
+- Errores de texto: the lab dice «SCIENCE IN EVERY SHAKE» y el tagline
+  oficial es **«SCIENCE BEHIND EVERY SHAKE»**. La cabecera de OASIS dice
+  «TRAIN · RECOVER · CONNECT» y el brief es **Train · Recover · Fuel**.
+- OASIS: el brief lo define como Wellness + Recovery + Longevity, con
+  contrast therapy (circuitos privados y semiprivados), massage therapy con
+  cuatro tipos (relajante, deportivo, descontracturante, drenaje linfático),
+  cámara hiperbárica y botas de compresión, **sin promesas médicas**. En la
+  web «Longevity» aparece como servicio (es un territorio, no un servicio),
+  la compresión dice «circulación y drenaje» (el drenaje es un masaje) y no
+  se distinguen los tipos de masaje. El brief pide que OASIS «no esté
+  subordinado visualmente a DÍNAMO»: la web dice «WELLNESS BY DINAMO».
+  Y OASIS **está por abrir**: objetivos «generar expectativa, lista
+  prioritaria, paquetes fundadores»; la web lo presenta como existente.
+- Duplicidad: la sección «Recovery» (sauna, hiperbárica, masaje, longevity)
+  vive bajo DÍNAMO y luego hay sección OASIS con lo mismo. El brief dice que
+  wellness/recovery pasan a OASIS y en DÍNAMO quedan sólo Technogym Checkup y
+  consultas de nutrición.
+- THE LAB: el brief prohíbe comunicarlo como cafetería o barra de smoothies:
+  es *performance nutrition*, «Real ingredients. Specific purpose.», shakes
+  por objetivo (Build / Recover / Fuel / Hydrate), macros visibles
+  (Protein / Carbs / Fat / Calories), add-ons (creatina 5 g, probióticos,
+  tart cherry, electrolitos, proteína extra) y recetas exclusivas. La web
+  lo llama «Shake bar» y lista PROTEÍNA / RECUPERACIÓN / ENERGÍA.
+- DÍNAMO entrena: fuerza, hipertrofia, cardio, funcional, movilidad,
+  performance, plyometrics y box. «Ocho formas de entrenar» mezcla
+  disciplinas con servicios (Recovery, Nutrición, Coworking) y le faltan
+  movilidad, plyometrics y box.
+- No aparecen en la web: DÍNAMO SOCIAL (círculo privado por invitación),
+  convenios corporativos y con hoteles, protocolos combinados
+  (entrenamiento + recuperación + bebida; Checkup + nutrición + shake…),
+  lista de espera de OASIS. Son objetivos comerciales del brief.
+- Coherente con Enrique: Latte Latte y Contorno no son marcas propias (el
+  brief sólo reconoce tres conceptos); the shop no está en el brief.
+- Contactos del proyecto según el brief: Montserrat Dipp (comercial,
+  estrategia, contenido de OASIS y THE LAB), Diego (finanzas, fotos y vídeos
+  permitidos), Enrique (visual, marketing, aprobación de copies).
+
 **Ideas que quedan si hiciera falta más:** bajar el tope a 1600 px en las
 fotos que nunca van a sangre (las de tarjetas y mitades); `srcset` por
 tamaño; convertir a WebP/AVIF (~30–40 % menos peso, requiere `<picture>`).
@@ -320,8 +378,15 @@ usa WebGL a mano); conviene actualizarlo.
   son «Todo lo que necesitas» (lista con fotos al hover) y El espacio
   (galería); las de lectura larga (manifiesto, timeline) deberían seguir
   claras.
-- **DINAMO Shop**: falta foto y texto reales (hoy `recepcion.jpg` y texto
-  genérico).
+- **the shop** (así se llama: Enrique mandó `THESHOP-LOGO.ai`, guardado en
+  `brand/`). El .ai es un PDF de 3 páginas: logo «THE SHOP @DINAMO», una
+  tarjeta de precios (Ryse, C4, Ghost, Dymatize, Monster: es una tienda de
+  suplementos y bebidas, no de ropa) y, de regalo, el logo «the lab by
+  shake bar». El logo es texto con fuente incrustada (el SVG exportado no
+  la lleva), así que va como PNG en hueso sobre transparente:
+  `public/img/site/theshop-logo.png` (1400×411, 61 KB), en la tarjeta de
+  marcas propias en lugar del nombre; copy reescrito con lo que vende.
+  **Falta foto real de la tienda** (sigue `recepcion.jpg`).
 - Sitio construido y verificado en navegador (`npm run build` OK; secciones
   YOU VS YOU, marcas propias, membresías y FAQ revisadas a 1500 px). Móvil
   sin probar en dispositivo.
