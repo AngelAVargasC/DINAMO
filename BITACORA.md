@@ -355,6 +355,34 @@ aplicó** (Angel: «sí, hazlo»):
   estrategia, contenido de OASIS y THE LAB), Diego (finanzas, fotos y vídeos
   permitidos), Enrique (visual, marketing, aprobación de copies).
 
+**Sin renders: sólo fotografía real (petición del cliente vía Angel).** Se
+comprobó la procedencia de las 73 fotos de la web por correlación contra
+`brand/RENDERS DINAMO PNG` (10 renders) y `brand/FOTOS INTERIORISMO` (34
+fotos reales). Resultado: 20 fotos de interiores ya eran reales (sauna,
+lockers, vestidores, tocador, lavabos, sala privada, cardio, funcional,
+terraza, pilates, fachadas, escaleras…). **Eran render 7 archivos** y se
+sustituyeron por foto real conservando el nombre (sin tocar marcado), con
+copia ligera en `img/uni/` donde existía:
+- `recepcion.jpg` (render entrada) → recorte cerrado del mostrador real
+  (`DINAMO-ESCALERAS.png`; `escaleras.jpg` es la misma foto en plano
+  general).
+- `lounge.jpg` (render sala de ventas, el de la captura de Enrique) →
+  `_DSC2697` (salón con sillones y celosía).
+- `coworking.jpg` y `site/coworking-tg.jpg` (render coworking) →
+  `0K9A9999.JPEG` (escritorio de madera con lámpara, bajo los cuadros).
+  **No hay foto real del coworking**: es lo más cercano.
+- `spa.jpg` (render sauna 12) → `_DSC2729` (pasillo de vestidores hacia el
+  mostrador). **No hay foto real del spa/OASIS** (aún no abre).
+- `lamparas.jpg` (render colgante) → `_DSC2625` (balcón con lámparas y
+  barandal).
+- `site/sauna-camara-tg.jpg` (render sauna en gris, venía de dinamo.fit) →
+  `_DSC2775` (sauna real con cristal).
+Sin usar aún, por si hacen falta: `_DSC2493/2520/2526` (salas de
+máquinas), `_DSC2619` (escalera con letras ON), `_DSC2682`, `_DSC2766`
+(pasillo de lockers), `3-SECCION3`. Fotos que **no** son de interiorismo
+(atletas, Technogym, brandbook) no se tocaron: son fotografía, no render.
+Hojas de contacto en el scratchpad de la sesión.
+
 **Ideas que quedan si hiciera falta más:** bajar el tope a 1600 px en las
 fotos que nunca van a sangre (las de tarjetas y mitades); `srcset` por
 tamaño; convertir a WebP/AVIF (~30–40 % menos peso, requiere `<picture>`).
