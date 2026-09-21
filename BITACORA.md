@@ -1,5 +1,54 @@
 # Bitácora — DINAMO
 
+## 2026-09-21 — Modelo vetado en `brand/people/`
+
+**Qué se hizo.** Angel indicó que el hombre de pelo canoso, barba y ambos
+antebrazos tatuados (el de la foto con barra Z y discos Technogym) **no debe
+aparecer en ninguna pieza**. Se revisaron las 158 fotos de `brand/people/`
+en hojas de contacto y se **borraron las 11 en las que sale**:
+`8 (2).jpg`, `8.jpg`, `11(1).jpg`, `11.jpg`, `12 (3).jpg` (grupo en
+caminadoras, él al centro), `13.png`, `20.png`, `21.png`, `26.jpg`,
+`31.png`, `32.png` (las dos últimas son manos tatuadas con kettlebell).
+`brand/` está en `.gitignore`, así que no hay rastro en git.
+
+**Validado, no volver a revisar.** Ninguna imagen de `web/public/img/`
+(ni `site/` ni `uni/`) lo muestra: la web no usa fotos de esa carpeta con él.
+Los otros hombres canosos de la carpeta (`1(1).jpg`, `1 (3).jpg`, sin
+tatuajes; `21 (2).jpg`, `21.jpg`, `DINAMO JULIO-AGOSTO-13/14`, brazos sin
+tatuar) son personas distintas y se conservan.
+
+### Universo DINAMO con fotos reales (misma sesión)
+
+**Qué se hizo.** Angel no quiere stock en «El universo DINAMO»: la nube 3D
+ahora usa **60 fotos reales de `brand/people/`** (44 con gente, 16 de
+espacios), regeneradas ligeras en `web/public/img/uni/` con prefijo `p-`
+(≤560 px, ~3 MB en total). Las 45 de stock que había en esa carpeta se
+borraron; sólo las usaba esta escena. Criterio de selección: sin carteles
+con texto superpuesto, sin duplicados (había muchos byte a byte), sin el
+modelo vetado, sin bodegones de producto.
+
+**Qué se decidió (Angel, tras ver la primera versión).** La escena debe
+parecer **un túnel de fotos por cuyo centro avanzamos**, no un montón
+centrado sobre el copy. Cambios para conseguirlo:
+- `index.astro`: las tarjetas ya no se reparten al azar por la pantalla,
+  van en **anillo alrededor del eje** (ángulo áureo, radio 26–46 vw /
+  24–44 vh) y la profundidad a intervalos regulares con ruido.
+- `ui.ts`: **niebla de profundidad** en la opacidad. Al fondo la
+  perspectiva junta todas las fotos en el punto de fuga (encima del texto);
+  ahora lejos casi no se ven y ganan cuerpo al acercarse y abrirse a los
+  bordes. Curva: `((zE+1500)/1400)^2.5`.
+- Como todas las fotos son verticales, sólo los espacios se muestran a veces
+  apaisados (recortar un retrato a 4:3 corta cabezas).
+- Tarjetas algo más pequeñas (7.5–13.5 rem) al haber 60 en vez de 45.
+
+**Validado en Chrome** a mitad del recorrido: 60 imágenes cargan sin error,
+centro despejado, nítidas por la periferia. No se revisó en móvil (allí la
+nube muestra la mitad de las tarjetas, como antes).
+
+**Abierto.** El zip `drive-download-20260919T054149Z-1-001.zip` (792 MB)
+sigue en `brand/people/` sin descomprimir; si se extrae, hay que volver a
+filtrar a este modelo.
+
 ## 2026-09-18 — Observaciones de Enrique (cliente) por WhatsApp
 
 Enrique revisó el sitio publicado y mandó estas correcciones. Se anotan
@@ -382,6 +431,20 @@ máquinas), `_DSC2619` (escalera con letras ON), `_DSC2682`, `_DSC2766`
 (pasillo de lockers), `3-SECCION3`. Fotos que **no** son de interiorismo
 (atletas, Technogym, brandbook) no se tocaron: son fotografía, no render.
 Hojas de contacto en el scratchpad de la sesión.
+**Cambios de foto pedidos por Enrique (WhatsApp, «te mando cuáles están
+mejores»):** en el collage en cruz del club, el balcón con lámparas (t3) →
+`sala-maquinas.jpg` (`_DSC2520`, sala de máquinas Technogym) y la zona
+funcional (t8) → `alto-rendimiento.jpg` (`_DSC2682`, sala de cardio con
+caminadoras). «Pon esa para alto rendimiento»: `_DSC2682` también sustituye
+a `rack.jpg` en el ítem 04 de la experiencia y en la tarjeta de Conceptos.
+Y la sauna del visor (`site/sauna-camara-tg.jpg`) pasa a `_DSC2754`. Los
+archivos `lamparas.jpg`, `funcional.jpg` y `rack.jpg` siguen existiendo
+(los usan otras secciones).
+El recuadro vertical con marco del collage (t6) pasa del pasillo (`spa.jpg`)
+a la sauna `_DSC2754` (`sauna.jpg`), también a petición de Enrique.
+El recuadro vertical de arriba a la derecha (t8) pasa a `escalera-on.jpg`
+(`_DSC2619`, caminadoras junto a la escalera con las letras ON); la sala de
+cardio `alto-rendimiento.jpg` se queda en Experiencia y Conceptos.
 
 **Ideas que quedan si hiciera falta más:** bajar el tope a 1600 px en las
 fotos que nunca van a sangre (las de tarjetas y mitades); `srcset` por

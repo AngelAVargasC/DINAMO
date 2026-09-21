@@ -8,7 +8,7 @@ const experiencia = [
   { n: "01", t: "Entrenamiento", d: "Peso libre, integrado y cardio", img: "/img/site/galeria-1.jpg" },
   { n: "02", t: "Technogym", d: "Equipamiento de última generación", img: "/img/technogym.jpg" },
   { n: "03", t: "Biostrength", d: "Fuerza con inteligencia artificial", img: "/img/site/biostrength-tg.jpg" },
-  { n: "04", t: "Alto rendimiento", d: "Programas de progresión medida", img: "/img/rack.jpg" },
+  { n: "04", t: "Alto rendimiento", d: "Programas de progresión medida", img: "/img/alto-rendimiento.jpg" },
   { n: "05", t: "Contorno Pilates", d: "Reformer en la terraza acristalada", img: "/img/site/pilates-tg.jpg" },
   { n: "06", t: "Recovery", d: "Sauna y cámara hiperbárica", img: "/img/site/sauna-camara-tg.jpg" },
   { n: "07", t: "Nutrición", d: "Acompañamiento y medición", img: "/img/lounge.jpg" },
@@ -19,36 +19,59 @@ const conceptos = [
   { t: "Peso libre", d: "Racks, mancuernas y platos olímpicos repartidos en tres plantas.", img: "/img/peso-libre.jpg" },
   { t: "Technogym", d: "La línea completa, con login en cada aparato y registro de cada serie.", img: "/img/technogym.jpg" },
   { t: "Biostrength", d: "Fuerza con carga que se ajusta a tu nivel real en cada repetición.", img: "/img/site/biostrength-tg.jpg" },
-  { t: "Alto rendimiento", d: "Programas de progresión medida para quien entrena con objetivo.", img: "/img/rack.jpg" },
+  { t: "Alto rendimiento", d: "Programas de progresión medida para quien entrena con objetivo.", img: "/img/alto-rendimiento.jpg" },
   { t: "Contorno Pilates", d: "Reformer y trabajo de suelo en la terraza acristalada.", img: "/img/site/pilates-tg.jpg" },
   { t: "Recovery", d: "Sauna, cámara hiperbárica y masaje de descarga en Oasis.", img: "/img/site/sauna-camara-tg.jpg" },
   { t: "Nutrición", d: "Acompañamiento y medición, con the lab a pie de sala.", img: "/img/lounge.jpg" },
   { t: "Coworking", d: "Tu jornada entera dentro del club, con Latte Latte al lado.", img: "/img/site/coworking-tg.jpg" },
 ];
 
-/* Universo flotante: TODO el pool de fotos, repartido en 3D con un hash
-   determinista (mismo cielo en cada build; nada de Math.random en runtime). */
+/* Universo flotante: fotos REALES del club (sesión de `brand/people`, ya
+   filtrada: sin carteles con texto, sin duplicados y sin el modelo vetado
+   — ver bitácora 2026-09-21). Versiones ligeras en /img/uni/ (≤560 px).
+   Repartidas en 3D con un hash determinista (mismo cielo en cada build;
+   nada de Math.random en runtime). Nada de stock aquí. */
+const uniEspacios = new Set([
+  "p-0k9a3431-2","p-0k9a3444-1","p-14-3","p-16-3","p-18","p-2-3",
+  "p-23-2","p-23","p-25","p-33","p-4-3","p-6-2",
+  "p-7","p-8-1","p-12-2","p-14",
+]);
 const uniFotos = [
-  "recepcion","escaleras","lamparas","cardio","cardio-sala","maquinas","peso-libre","rack","funcional","technogym",
-  "gym-wide","vestidores","lockers","tocador","lavabos","sauna","sauna-detalle","spa","terraza","coworking",
-  "lounge","sala-privada","trainer","biostrength","barbell-setup","fachada-noche","fachada-entrada","walk-light","gym-dark","portrait",
-  "training","deadlift","sprint","grip","chalk-hands","situps","situps2","medball","scream","runners",
-  "rope-back","rope-jump","chalk-plate","battle-ropes","pilates",
-].map((n, i) => {
+  "p-0k9a2160-1","p-0k9a2294-1","p-0k9a2396","p-0k9a3431-2","p-0k9a2581-1","p-0k9a2738-1",
+  "p-0k9a3521-2","p-0k9a3444-1","p-0k9a7884-1","p-0k9a7972-1","p-0k9a8016","p-14-3",
+  "p-0k9a8526-1","p-1-3","p-1","p-16-3","p-10-2","p-10-3",
+  "p-10","p-18","p-12","p-13-1","p-15-2","p-2-3",
+  "p-15-3","p-16-1","p-16","p-23-2","p-17-3","p-17-1",
+  "p-19-2","p-23","p-2","p-22","p-24-1","p-25",
+  "p-27-1","p-27","p-28-1","p-33","p-29","p-3-3",
+  "p-30","p-4-3","p-36","p-39","p-4","p-6-2",
+  "p-40","p-44","p-5-1","p-7","p-6-1","p-6",
+  "p-7-3","p-8-1","p-8-3","p-9","p-12-2","p-14",
+].map((n, i, all) => {
   const r = (k: number) => {
     const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
     return s - Math.floor(s);
   };
+  // TÚNEL, no montón: las fotos van en un anillo alrededor del eje de avance
+  // (ángulo áureo → reparto uniforme sin dos vecinas pegadas) y el centro,
+  // donde vive el copy y por donde "vuela" la cámara, queda despejado.
+  // La profundidad se reparte a intervalos regulares con un poco de ruido:
+  // la cámara siempre tiene algo cerca, nunca un hueco ni un tapón.
+  const ang = i * 2.39996 + (r(1) - 0.5) * 0.5;
+  const rad = r(2);
+  const rx = 26 + rad * 20;  // vw desde el centro (26..46)
+  const ry = 24 + rad * 20;  // vh desde el centro (24..44)
+  const z = 120 + (i / all.length) * 2300 + (r(3) - 0.5) * 120;
   return {
-    // versión ligera: la nube las muestra pequeñas y a resolución completa
-    // eran 11 MB de textura para tarjetas de trescientos píxeles
-    src: `/img/uni/${n.split("/").pop()}.jpg`,
-    x: (3 + r(1) * 88).toFixed(1),
-    y: (6 + r(2) * 78).toFixed(1),
-    z: -(120 + r(3) * 2300).toFixed(0),
-    w: (9 + r(4) * 9).toFixed(1),
+    src: `/img/uni/${n}.jpg`,
+    x: (50 + Math.cos(ang) * rx).toFixed(1),
+    y: (50 + Math.sin(ang) * ry).toFixed(1),
+    z: (-z).toFixed(0),
+    w: (7.5 + r(4) * 6).toFixed(1),
     b: (6 + r(5) * 6).toFixed(1),
-    a: r(6) > 0.55 ? "3 / 4" : "4 / 3",
+    // todas las fotos son verticales; sólo los espacios (sin caras que
+    // cortar) se muestran a veces apaisados para variar la nube
+    a: uniEspacios.has(n) && r(6) > 0.4 ? "4 / 3" : "3 / 4",
   };
 });
 
@@ -224,12 +247,12 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
         <div class="cross" aria-label="Interiores del club">
           <div class="cross-t t1 media rv-img" data-depth="0.22"><img decoding="async" src="/img/recepcion.jpg" alt="Recepción" loading="lazy" /></div>
           <div class="cross-t t2 media rv-img" data-depth="0.26" style="--d:1"><img decoding="async" src="/img/maquinas.jpg" alt="Sala de peso integrado" loading="lazy" /></div>
-          <div class="cross-t t3 media rv-img" data-depth="0.5" style="--d:2"><img decoding="async" src="/img/lamparas.jpg" alt="Lámparas de la recepción" loading="lazy" /></div>
+          <div class="cross-t t3 media rv-img" data-depth="0.5" style="--d:2"><img decoding="async" src="/img/sala-maquinas.jpg" alt="Sala de máquinas Technogym" loading="lazy" /></div>
           <div class="cross-t t4 media rv-img" data-depth="0.1" style="--d:1"><img decoding="async" src="/img/terraza.jpg" alt="Terraza acristalada" loading="lazy" /></div>
           <div class="cross-t t5 media rv-img" data-depth="0.26" style="--d:2"><img decoding="async" src="/img/cardio-sala.jpg" alt="Sala de cardio" loading="lazy" /></div>
-          <div class="cross-t t6 media rv-img" data-depth="0.5" style="--d:3"><img decoding="async" src="/img/spa.jpg" alt="Spa" loading="lazy" /></div>
+          <div class="cross-t t6 media rv-img" data-depth="0.5" style="--d:3"><img decoding="async" src="/img/sauna.jpg" alt="Sauna" loading="lazy" /></div>
           <div class="cross-t t7 media rv-img" data-depth="0.22" style="--d:2"><img decoding="async" src="/img/vestidores.jpg" alt="Vestidores" loading="lazy" /></div>
-          <div class="cross-t t8 media rv-img" data-depth="0.45" style="--d:3"><img decoding="async" src="/img/funcional.jpg" alt="Zona funcional" loading="lazy" /></div>
+          <div class="cross-t t8 media rv-img" data-depth="0.45" style="--d:3"><img decoding="async" src="/img/escalera-on.jpg" alt="Caminadoras junto a la escalera principal" loading="lazy" /></div>
         </div>
       </section>
 

@@ -849,7 +849,7 @@ html.menu-lock { overflow: hidden; }
   opacity: var(--uo, 0);
   overflow: hidden;
 }
-/* lejos del universo, la nube (45 figuras 3D) ni se pinta ni se compone */
+/* lejos del universo, la nube (60 figuras 3D) ni se pinta ni se compone */
 .uni:not(.vis) .uni-cloud { content-visibility: hidden; }
 .uni-it img {
   width: 100%;
@@ -904,7 +904,7 @@ html.menu-lock { overflow: hidden; }
 .uni-line em { font-style: normal; font-weight: 500; color: var(--accent); }
 @media (max-width: 900px) {
   .uni { height: 260vh; }
-  /* la mitad de la nube: en pantalla chica 45 fotos son ruido y peso */
+  /* la mitad de la nube: en pantalla chica 60 fotos son ruido y peso */
   .uni-it:nth-child(2n) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {

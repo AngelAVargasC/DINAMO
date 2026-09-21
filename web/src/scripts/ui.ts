@@ -760,8 +760,14 @@ function syncUni(dt: number, sy: number) {
     const zE = it.z + cam;
     const entra = Math.max(0, Math.min(1, (zE + 2500) / 480));
     const sale = Math.max(0, Math.min(1, 1 - (zE - 320) / 260));
+    // Niebla de profundidad: al fondo del túnel la perspectiva junta todas
+    // las fotos en el punto de fuga, encima del copy. Lejos se ven apenas
+    // (un resplandor) y ganan cuerpo conforme se acercan y se abren hacia
+    // los bordes, que es donde deben lucir.
+    // (a 800 px de la cámara aún va al ~15 %; a 200 px ya casi al 100 %)
+    const niebla = Math.pow(Math.max(0, Math.min(1, (zE + 1500) / 1400)), 2.5);
     // las fotos sólo existen en el acto 3, con la sala ya a oscuras
-    setVar(it.el, "--uo", (entra * sale * uimg).toFixed(3));
+    setVar(it.el, "--uo", (entra * sale * uimg * (0.05 + 0.95 * niebla)).toFixed(3));
   }
 }
 
