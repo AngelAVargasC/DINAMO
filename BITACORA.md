@@ -6,9 +6,11 @@
 recortes sin fondo** que el diseñador dejó en `brand/personashero/`. Se
 regeneraron en `web/public/img/hero/p*-*.webp` (B/N como la figura anterior,
 alto máx. 1600 px; los originales pesan 117 MB y no van al repo). **Van
-cuatro**: mancuerna, soga, mochila, kettlebell. El chico sentado con la
-mancuerna (`p3-curl`, «recore gym boy curl con mancuerna.png») **queda fuera
-por decisión de Angel**: «no se ve bien». No volver a meterlo.
+dos**: mancuerna (`IMG_0429.PNG`) y mochila (`IMG_0430.PNG`). **Fuera por
+decisión de Angel, no volver a meterlos**: el chico sentado con la mancuerna
+(«recore gym boy curl con mancuerna.png», «no se ve bien»), la chica de la
+soga («recorte gym girl soga.png») y la de la kettlebell («recorte gym
+girl.png»).
 - `index.astro`: `.hero-figure` contiene ahora `.hero-figs` con las cinco
   `<img>` apiladas; la primera (`p1-mancuerna`, la de mayor resolución) lleva
   `is-on` y `fetchpriority="high"`. Mismo juego en móvil y escritorio: ya no
@@ -27,21 +29,22 @@ por decisión de Angel**: «no se ve bien». No volver a meterlo.
   `min(102vh, 68rem)`: los recortes nuevos traen la cabeza entera y con la
   altura vieja quedaba fuera del encuadre.
 - `ui.ts`: el paralaje del puntero se aplica a `.hero-figs` (antes a la única
-  `img`). Nuevo bloque «carrusel de personas»: cada 2,8 s pasa `is-on` a la
-  siguiente (Angel pidió bajarlo de los 4,2 s iniciales), esperando `decode()`
+  `img`). Nuevo bloque «carrusel de personas»: cada 8,4 s pasa `is-on` a la
+  siguiente (fue 4,2 s, Angel lo bajó a 2,8 s y luego pidió «un 200 % más
+  largo»: ×3), esperando `decode()`
   de la entrante para no fundir a una imagen a medio cargar. Se **pausa** cuando el hero sale de pantalla
   (IntersectionObserver) o la pestaña está oculta; con `prefers-reduced-motion`
   se queda la primera quieta.
 
-**Validado, no volver a revisar.** Las cuatro figuras comparten centro
+**Validado, no volver a revisar.** Las figuras comparten centro
 (~74 vw en escritorio 1652×1017, ~64 vw en móvil 390×844): ninguna cabeza
 cortada, en móvil el texto sigue en el tercio superior sin solaparse. `astro check` y `npm run
 build` pasan.
 
 **Qué quedó abierto.**
-- `p5-kettlebell` viene de un original de sólo 358×1041 px: en escritorio se
-  estira ×3 y se ve algo blando. Pedir al diseñador ese recorte en alta (el
-  resto son de 3500–5500 px de alto). `p2-mochila` (828×906) está en el límite.
+- `p2-mochila` viene de un original de 828×906 px: en escritorio se estira
+  y está en el límite de nitidez. Si se quiere más limpio, pedir ese recorte
+  en alta al diseñador.
 - En escritorio, la chica de la mochila (`p2`) tiene el móvil justo sobre el
   final de «transforms.»: el velo blanco lo salva, pero si a Angel le molesta
   se puede desplazar esa figura unos vw a la derecha con una regla propia.
