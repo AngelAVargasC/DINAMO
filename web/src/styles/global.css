@@ -528,18 +528,27 @@ html.menu-lock { overflow: hidden; }
 .hero-figs {
   position: relative;
   height: 100%;
+  /* Caja de ancho fijo: las figuras se centran dentro de ella (ver abajo), no
+     se pegan al borde derecho. Antes, ancladas a la derecha, las estrechas
+     (soga, kettlebell) se iban al filo y las anchas quedaban centradas. */
+  width: 50vw;
   transform: translate3d(var(--dx, 0px), var(--dy, 0px), 0);
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
-/* Carrusel: todas las personas apiladas, ancladas abajo a la derecha (los
-   recortes tienen anchos muy distintos, de la chica de la soga al chico del
-   curl; anclados a la derecha el cambio de ancho crece hacia el titular sin
-   descolocar nada). Sólo la .is-on se ve; la que entra llega desde la derecha
-   un pelín pequeña y la que sale (.is-off) sigue su inercia hacia la
-   izquierda, para que se lea como relevo y no como parpadeo. */
+/* Carrusel: todas las personas apiladas, ancladas abajo y centradas en el
+   mismo eje (left/right 0 + margin auto: los recortes van de 0,36 a 0,9 de
+   ancho por alto y así todas comparten centro, petición de Angel). Sólo la
+   .is-on se ve; la que entra llega desde la derecha un pelín pequeña y la que
+   sale (.is-off) sigue su inercia hacia la izquierda, para que se lea como
+   relevo y no como parpadeo. */
 .hero-figs img {
   position: absolute;
-  right: 0;
+  /* left/right negativos: la caja de centrado es mas ancha que .hero-figs
+     pero con el mismo centro, asi tambien se centran las figuras mas anchas
+     que la caja (la mochila) en vez de pegarse al lado izquierdo */
+  left: -50vw;
+  right: -50vw;
+  margin: 0 auto;
   bottom: 0;
   height: 100%;
   width: auto;
@@ -549,10 +558,10 @@ html.menu-lock { overflow: hidden; }
   display: block;
   opacity: 0;
   transform: translateX(3%) scale(0.985);
-  transform-origin: 70% 100%;
+  transform-origin: 50% 100%;
   transition:
-    opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 1.9s cubic-bezier(0.2, 0.8, 0.3, 1);
+    opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1.3s cubic-bezier(0.2, 0.8, 0.3, 1);
   pointer-events: none;
 }
 .hero-figs img.is-on {
@@ -580,10 +589,14 @@ html.menu-lock { overflow: hidden; }
   .hero .hero-foot { position: static; margin-top: 1.4rem; }
   .hero-figure {
     height: 56vh;
-    right: -12vw;
+    right: -2vw;
     bottom: -2vh;
     opacity: 1;
   }
+  /* centro de las figuras a ~68vw: las anchas (mochila) rebasan por ambos
+     lados y se recortan con el filo, las estrechas quedan a la derecha del
+     texto sin pegarse al borde */
+  .hero-figs { width: 68vw; }
   .hb-iso { opacity: 0.05; }
 }
 /* Velo claro por la izquierda: el final del titular caía sobre el brazo oscuro

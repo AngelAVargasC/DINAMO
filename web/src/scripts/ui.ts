@@ -201,7 +201,7 @@ if (heroSec && capas.length && !reduced) {
    se acumulan saltos. Con reduced-motion se queda la primera, quieta. */
 const figs = Array.from(document.querySelectorAll<HTMLImageElement>(".hero-figs img"));
 if (figs.length > 1 && !reduced) {
-  const PAUSA = 4200;
+  const PAUSA = 2800;
   let actual = Math.max(0, figs.findIndex((f) => f.classList.contains("is-on")));
   let temporizador = 0;
   let enPantalla = true;

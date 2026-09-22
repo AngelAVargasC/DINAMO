@@ -3,34 +3,39 @@
 ## 2026-09-21 — Carrusel de personas en el hero
 
 **Qué se hizo.** La atleta fija del hero se sustituye por un **carrusel de
-cinco recortes sin fondo** que el diseñador dejó en `brand/personashero/`
-(mancuerna, chico del curl, soga, mochila, kettlebell). Se regeneraron en
-`web/public/img/hero/p1…p5-*.webp` (B/N como la figura anterior, alto máx.
-1600 px, 730 KB los cinco; los originales pesan 117 MB y no van al repo).
+recortes sin fondo** que el diseñador dejó en `brand/personashero/`. Se
+regeneraron en `web/public/img/hero/p*-*.webp` (B/N como la figura anterior,
+alto máx. 1600 px; los originales pesan 117 MB y no van al repo). **Van
+cuatro**: mancuerna, soga, mochila, kettlebell. El chico sentado con la
+mancuerna (`p3-curl`, «recore gym boy curl con mancuerna.png») **queda fuera
+por decisión de Angel**: «no se ve bien». No volver a meterlo.
 - `index.astro`: `.hero-figure` contiene ahora `.hero-figs` con las cinco
   `<img>` apiladas; la primera (`p1-mancuerna`, la de mayor resolución) lleva
   `is-on` y `fetchpriority="high"`. Mismo juego en móvil y escritorio: ya no
   hay `corredora-mobile.png` aparte (el archivo y `atleta-light.png` siguen en
   `public/img/site/` sin uso, por si se quiere volver).
-- `global.css`: las figuras van absolutas, ancladas abajo-derecha (los anchos
-  van de 0,36 a 0,9 de alto, así el cambio de ancho crece hacia el titular sin
-  descolocar nada). Fundido de 1,5 s en opacidad + 1,9 s de transform: la que
-  entra llega desde la derecha un poco pequeña, la que sale (`.is-off`) sigue
-  hacia la izquierda. `max-width: none` obligatorio: el reset global
+- `global.css`: las figuras van absolutas, ancladas abajo y **centradas todas
+  en el mismo eje** (`.hero-figs` es una caja de 50vw en escritorio / 68vw en
+  móvil; las `img` llevan `left/right: -50vw; margin: 0 auto`, así comparten
+  centro aunque sean más anchas que la caja). Primera versión las anclaba a
+  la derecha y Angel lo devolvió: las estrechas (soga, kettlebell) se iban al
+  filo y las anchas quedaban centradas. Fundido de 1 s en opacidad + 1,3 s de
+  transform: la que entra llega desde la derecha un poco pequeña, la que sale
+  (`.is-off`) sigue hacia la izquierda. `max-width: none` obligatorio: el reset global
   (`img { max-width: 100% }`) dentro de un contenedor de ancho 0 dejaba las
   figuras a 0 px. Altura de `.hero-figure` bajada de 111vh a
   `min(102vh, 68rem)`: los recortes nuevos traen la cabeza entera y con la
   altura vieja quedaba fuera del encuadre.
 - `ui.ts`: el paralaje del puntero se aplica a `.hero-figs` (antes a la única
-  `img`). Nuevo bloque «carrusel de personas»: cada 4,2 s pasa `is-on` a la
-  siguiente, esperando `decode()` de la entrante para no fundir a una imagen a
-  medio cargar. Se **pausa** cuando el hero sale de pantalla
+  `img`). Nuevo bloque «carrusel de personas»: cada 2,8 s pasa `is-on` a la
+  siguiente (Angel pidió bajarlo de los 4,2 s iniciales), esperando `decode()`
+  de la entrante para no fundir a una imagen a medio cargar. Se **pausa** cuando el hero sale de pantalla
   (IntersectionObserver) o la pestaña está oculta; con `prefers-reduced-motion`
   se queda la primera quieta.
 
-**Validado, no volver a revisar.** Las cinco figuras encuadran bien en
-escritorio (1652×1017) y en móvil (390×844): ninguna cabeza cortada, en móvil
-el texto sigue en el tercio superior sin solaparse. `astro check` y `npm run
+**Validado, no volver a revisar.** Las cuatro figuras comparten centro
+(~74 vw en escritorio 1652×1017, ~64 vw en móvil 390×844): ninguna cabeza
+cortada, en móvil el texto sigue en el tercio superior sin solaparse. `astro check` y `npm run
 build` pasan.
 
 **Qué quedó abierto.**
