@@ -36,6 +36,10 @@
   --lab-mid: #301b59;
   --lab-pink: #e3197f;
   --oasis-indigo: #2c3a8c;
+  /* acentos de submarca reutilizables (petición de Angel, 2026-09-21): donde
+     se hable de the lab o de OASIS, el bloque toma SU color, no el amarillo */
+  --tint-lab: linear-gradient(100deg, var(--lab-deep) 0%, var(--lab-mid) 55%, #4a1f6e 100%);
+  --tint-oasis: linear-gradient(100deg, #e0653a 0%, #b23a6a 32%, var(--oasis-indigo) 68%, #1f7f83 100%);
 
   --font: "Acumin", "Helvetica Neue", Arial, sans-serif;
   --pad: clamp(1.25rem, 5vw, 5.5rem);
@@ -382,6 +386,13 @@ img { max-width: 100%; display: block; }
 .menu-nav a:hover .roll { transform: translateY(-100%); }
 @media (prefers-reduced-motion: reduce) { .roll { transition: none; } }
 .menu-nav a:hover > i { opacity: 1; color: var(--accent); }
+.menu-nav a.tint-lab:hover > i { color: var(--lab-pink); }
+.menu-nav a.tint-oasis:hover > i {
+  color: transparent;
+  background: var(--tint-oasis);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 .menu-nav a.on > i { opacity: 1; }
 
 .menu-foot {
@@ -506,20 +517,54 @@ html.menu-lock { overflow: hidden; }
   right: 1.3vw;
   bottom: -4vh;
   z-index: 1;
-  /* Un punto más alta: así el borde superior del recorte —donde los mechones
-     acaban en línea recta— queda por encima del filo de la pantalla. */
-  height: min(111vh, 73rem);
+  /* Los recortes del carrusel traen la cabeza entera (ya no hay canto recto
+     que esconder por arriba): la altura baja para que ninguna cabeza salga
+     del encuadre. Con bottom:-4vh, 102vh deja 2vh de aire arriba. */
+  height: min(102vh, 68rem);
 }
-.hero-figure img {
+/* El paralaje del puntero (--dx/--dy, desde ui.ts) va en el envoltorio y no
+   en cada imagen: así las cinco se mueven como una sola pieza y el fundido
+   entre personas no pelea con ese transform. */
+.hero-figs {
+  position: relative;
   height: 100%;
-  width: auto;
-  display: block;
   transform: translate3d(var(--dx, 0px), var(--dy, 0px), 0);
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
+/* Carrusel: todas las personas apiladas, ancladas abajo a la derecha (los
+   recortes tienen anchos muy distintos, de la chica de la soga al chico del
+   curl; anclados a la derecha el cambio de ancho crece hacia el titular sin
+   descolocar nada). Sólo la .is-on se ve; la que entra llega desde la derecha
+   un pelín pequeña y la que sale (.is-off) sigue su inercia hacia la
+   izquierda, para que se lea como relevo y no como parpadeo. */
+.hero-figs img {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: auto;
+  /* el reset global pone max-width: 100% a las img; aqui el contenedor mide
+     0 de ancho (solo tiene alto) y la figura desaparecia */
+  max-width: none;
+  display: block;
+  opacity: 0;
+  transform: translateX(3%) scale(0.985);
+  transform-origin: 70% 100%;
+  transition:
+    opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1.9s cubic-bezier(0.2, 0.8, 0.3, 1);
+  pointer-events: none;
+}
+.hero-figs img.is-on {
+  opacity: 1;
+  transform: none;
+}
+.hero-figs img.is-off {
+  transform: translateX(-2.5%) scale(1.01);
+}
 @media (prefers-reduced-motion: reduce) {
   .hero-figure { animation: none; }
-  .hb, .hero-figure img { transition: none; }
+  .hb, .hero-figs, .hero-figs img { transition: none; }
 }
 @media (max-width: 900px) {
   /* Recorte propio para móvil (corredora-mobile.png): sin fondo, el pelo
@@ -1330,6 +1375,18 @@ html.menu-lock { overflow: hidden; }
 }
 /* hover y selección: mismo trato — bloque amarillo, texto en tinta */
 .day-row:hover, .day-row.on { background: var(--accent); }
+/* la sección va en oscuro (Angel, 2026-09-21): filos claros y texto hueso */
+.dark .day, .dark .day-row { border-color: var(--line-light); }
+.dark .day-t { color: var(--bone); }
+/* The Lab y Oasis no se encienden en amarillo sino con su propia paleta */
+.day-row.tint-lab:hover, .day-row.tint-lab.on { background: var(--tint-lab); }
+.day-row.tint-oasis:hover, .day-row.tint-oasis.on { background: var(--tint-oasis); }
+.day-row.tint-lab:hover .day-t, .day-row.tint-lab.on .day-t,
+.day-row.tint-oasis:hover .day-t, .day-row.tint-oasis.on .day-t { color: #fff; }
+.day-row.tint-lab:hover .day-h, .day-row.tint-lab.on .day-h { color: var(--lab-pink); }
+.day-row.tint-oasis:hover .day-h, .day-row.tint-oasis.on .day-h { color: rgba(255, 255, 255, 0.85); }
+.day-row.tint-lab:hover .day-d, .day-row.tint-lab.on .day-d,
+.day-row.tint-oasis:hover .day-d, .day-row.tint-oasis.on .day-d { color: rgba(255, 255, 255, 0.72); }
 .day-h {
   font-size: 0.78rem;
   font-weight: 500;
@@ -1502,6 +1559,18 @@ html.menu-lock { overflow: hidden; }
   background: linear-gradient(0deg, rgba(10, 10, 8, 0.92) 0%,
               rgba(10, 10, 8, 0.55) 38%, rgba(10, 10, 8, 0.05) 68%, transparent 100%);
   pointer-events: none;
+}
+/* OASIS y the lab: el velo de la tarjeta va en su color, no en negro */
+.eco-card.tint-lab::after {
+  background: linear-gradient(0deg, rgba(36, 8, 62, 0.94) 0%,
+              rgba(48, 27, 89, 0.55) 36%, transparent 64%);
+}
+.eco-card.tint-lab .eco-body h3 { color: var(--lab-pink); }
+.eco-card.tint-oasis::after {
+  background:
+    linear-gradient(0deg, rgba(44, 58, 140, 0.88) 0%, rgba(44, 58, 140, 0.45) 36%, transparent 64%),
+    radial-gradient(60% 40% at 18% 100%, rgba(224, 101, 58, 0.7) 0%, transparent 70%),
+    radial-gradient(50% 40% at 88% 96%, rgba(31, 127, 131, 0.7) 0%, transparent 70%);
 }
 .eco-body {
   position: absolute;

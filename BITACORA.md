@@ -1,5 +1,49 @@
 # Bitácora — DINAMO
 
+## 2026-09-21 — Carrusel de personas en el hero
+
+**Qué se hizo.** La atleta fija del hero se sustituye por un **carrusel de
+cinco recortes sin fondo** que el diseñador dejó en `brand/personashero/`
+(mancuerna, chico del curl, soga, mochila, kettlebell). Se regeneraron en
+`web/public/img/hero/p1…p5-*.webp` (B/N como la figura anterior, alto máx.
+1600 px, 730 KB los cinco; los originales pesan 117 MB y no van al repo).
+- `index.astro`: `.hero-figure` contiene ahora `.hero-figs` con las cinco
+  `<img>` apiladas; la primera (`p1-mancuerna`, la de mayor resolución) lleva
+  `is-on` y `fetchpriority="high"`. Mismo juego en móvil y escritorio: ya no
+  hay `corredora-mobile.png` aparte (el archivo y `atleta-light.png` siguen en
+  `public/img/site/` sin uso, por si se quiere volver).
+- `global.css`: las figuras van absolutas, ancladas abajo-derecha (los anchos
+  van de 0,36 a 0,9 de alto, así el cambio de ancho crece hacia el titular sin
+  descolocar nada). Fundido de 1,5 s en opacidad + 1,9 s de transform: la que
+  entra llega desde la derecha un poco pequeña, la que sale (`.is-off`) sigue
+  hacia la izquierda. `max-width: none` obligatorio: el reset global
+  (`img { max-width: 100% }`) dentro de un contenedor de ancho 0 dejaba las
+  figuras a 0 px. Altura de `.hero-figure` bajada de 111vh a
+  `min(102vh, 68rem)`: los recortes nuevos traen la cabeza entera y con la
+  altura vieja quedaba fuera del encuadre.
+- `ui.ts`: el paralaje del puntero se aplica a `.hero-figs` (antes a la única
+  `img`). Nuevo bloque «carrusel de personas»: cada 4,2 s pasa `is-on` a la
+  siguiente, esperando `decode()` de la entrante para no fundir a una imagen a
+  medio cargar. Se **pausa** cuando el hero sale de pantalla
+  (IntersectionObserver) o la pestaña está oculta; con `prefers-reduced-motion`
+  se queda la primera quieta.
+
+**Validado, no volver a revisar.** Las cinco figuras encuadran bien en
+escritorio (1652×1017) y en móvil (390×844): ninguna cabeza cortada, en móvil
+el texto sigue en el tercio superior sin solaparse. `astro check` y `npm run
+build` pasan.
+
+**Qué quedó abierto.**
+- `p5-kettlebell` viene de un original de sólo 358×1041 px: en escritorio se
+  estira ×3 y se ve algo blando. Pedir al diseñador ese recorte en alta (el
+  resto son de 3500–5500 px de alto). `p2-mochila` (828×906) está en el límite.
+- En escritorio, la chica de la mochila (`p2`) tiene el móvil justo sobre el
+  final de «transforms.»: el velo blanco lo salva, pero si a Angel le molesta
+  se puede desplazar esa figura unos vw a la derecha con una regla propia.
+- Cadencia (4,2 s) y duración del fundido son a ojo: ajustar si el cliente
+  las quiere más rápidas o más lentas (`PAUSA` en `ui.ts`, transiciones en
+  `.hero-figs img`).
+
 ## 2026-09-21 — Modelo vetado en `brand/people/`
 
 **Qué se hizo.** Angel indicó que el hombre de pelo canoso, barba y ambos
@@ -44,6 +88,32 @@ centrado sobre el copy. Cambios para conseguirlo:
 **Validado en Chrome** a mitad del recorrido: 60 imágenes cargan sin error,
 centro despejado, nítidas por la periferia. No se revisó en móvil (allí la
 nube muestra la mitad de las tarjetas, como antes).
+
+### «Un día» en oscuro y acento propio de the lab / OASIS (misma sesión)
+
+**Qué se hizo.**
+- La sección «Entrena. Recupérate. Conecta.» pasa a **fondo oscuro**
+  (`sec dark bg-ink`, con el `.wrap` dentro para que el negro cubra todo el
+  ancho). Filos en `--line-light`, títulos en hueso.
+- Nuevos tokens en `:root`: `--tint-lab` (degradado morado profundo →
+  morado medio) y `--tint-oasis` (aurora: naranja → magenta → índigo →
+  verde azulado, los mismos colores de la sección OASIS). Clases
+  `tint-lab` / `tint-oasis` para aplicarlos.
+- **Filas The Lab y Oasis del timeline**: al pasar el cursor o quedar
+  seleccionadas ya no van en amarillo sino con su degradado; texto blanco,
+  la hora de The Lab en magenta.
+- **Tarjetas del ecosistema**: el velo inferior de OASIS y the lab toma su
+  color en vez de negro; el nombre «the lab» en magenta.
+- **Menú a pantalla completa**: hover de «the lab» en magenta y de «OASIS»
+  con el degradado aurora recortado al texto.
+
+**Qué se decidió (Angel).** Donde se hable de the lab o de OASIS, el bloque
+lleva SU paleta, no el amarillo DINAMO. Regla a mantener en piezas nuevas.
+
+**Validado en Chrome:** sección oscura a todo el ancho, fila The Lab
+(morado + hora magenta), fila Oasis (aurora) y tarjetas del ecosistema con
+sus velos. No se comprobó en pantalla el hover del menú ni el velo tras
+aligerarlo un punto (sólo CSS; build correcto).
 
 **Abierto.** El zip `drive-download-20260919T054149Z-1-001.zip` (792 MB)
 sigue en `brand/people/` sin descomprimir; si se extrae, hay que volver a

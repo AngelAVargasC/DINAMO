@@ -158,8 +158,8 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
         <a href="#journey" data-sec="journey" style="--i:5"><i>La app</i></a>
         <a href="#ecosistema" data-sec="ecosistema" style="--i:6"><i>Ecosistema</i></a>
         <a href="#membresias" data-sec="membresias" style="--i:7"><i>Membresías</i></a>
-        <a href="#thelab" data-sec="thelab" style="--i:8"><i>the lab</i></a>
-        <a href="#oasis" data-sec="oasis" style="--i:9"><i>OASIS</i></a>
+        <a href="#thelab" data-sec="thelab" class="tint-lab" style="--i:8"><i>the lab</i></a>
+        <a href="#oasis" data-sec="oasis" class="tint-oasis" style="--i:9"><i>OASIS</i></a>
       </nav>
 
       <div class="menu-foot">
@@ -189,12 +189,19 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
           <span class="hb hb-floor"></span>
         </div>
         <div class="hero-figure" data-depth="0.35" aria-hidden="true">
-          <!-- móvil: recorte con alfa de la corredora nueva (pelo entero, sin el
-               corte recto del recorte de escritorio); escritorio: el de siempre -->
-          <picture>
-            <source media="(max-width: 900px)" srcset="/img/site/corredora-mobile.png" />
-            <img decoding="async" src="/img/site/atleta-light.png" alt="" fetchpriority="high" />
-          </picture>
+          <!-- Carrusel de personas: los recortes sin fondo de brand/personashero
+               (regenerados en B/N y WebP en public/img/hero). Van apilados en
+               el mismo sitio y ui.ts los va fundiendo uno tras otro; el primero
+               es el que carga con prioridad porque es el que se ve al abrir.
+               Mismo juego en móvil y escritorio: el .hero-figs se recorta solo
+               por altura, así que cada recorte ocupa lo que le toca. -->
+          <div class="hero-figs">
+            <img class="is-on" src="/img/hero/p1-mancuerna.webp" alt="" fetchpriority="high" decoding="async" />
+            <img src="/img/hero/p3-curl.webp" alt="" decoding="async" />
+            <img src="/img/hero/p4-soga.webp" alt="" decoding="async" />
+            <img src="/img/hero/p2-mochila.webp" alt="" decoding="async" />
+            <img src="/img/hero/p5-kettlebell.webp" alt="" decoding="async" />
+          </div>
         </div>
 
         <div class="hero-inner">
@@ -366,7 +373,8 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
       </section>
 
       <!-- ═══════ UN DÍA ═══════ -->
-      <section class="sec pad-y wrap bg-bone" data-theme="light">
+      <section class="sec dark pad-y bg-ink" data-theme="dark">
+        <div class="wrap">
         <h2 class="display rv" data-lines style="--d:1">Entrena. Recupérate.<br /><em>Conecta</em>.</h2>
         <div class="day-grid">
         <ol class="day">
@@ -375,7 +383,7 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
             <span class="day-t">Primer turno</span>
             <span class="day-d">Fuerza, alto rendimiento o tu clase de la mañana</span>
           </li>
-          <li class="day-row rv" data-rv="left" style="--d:1">
+          <li class="day-row tint-lab rv" data-rv="left" style="--d:1">
             <span class="day-h">07:30</span>
             <span class="day-t">The Lab</span>
             <span class="day-d">Shake post-entreno formulado al gramo</span>
@@ -385,7 +393,7 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
             <span class="day-t">Coworking</span>
             <span class="day-d">Tu jornada sin salir del club, con Latte Latte al lado</span>
           </li>
-          <li class="day-row rv" data-rv="left" style="--d:3">
+          <li class="day-row tint-oasis rv" data-rv="left" style="--d:3">
             <span class="day-h">19:00</span>
             <span class="day-t">Oasis</span>
             <span class="day-d">Sauna, cámara hiperbárica o masaje de descarga</span>
@@ -403,6 +411,7 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
           <img decoding="async" src="/img/coworking.jpg" alt="" loading="lazy" />
           <img decoding="async" src="/img/sauna.jpg" alt="" loading="lazy" />
           <img decoding="async" src="/img/terraza.jpg" alt="" loading="lazy" />
+        </div>
         </div>
         </div>
       </section>
@@ -642,7 +651,7 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
         </div>
 
           <div class="eco">
-            <article class="eco-card rv" data-rv="scale">
+            <article class="eco-card tint-oasis rv" data-rv="scale">
               <div class="media rv-img" data-par="0.08">
                 <img decoding="async" src="/img/spa.jpg" alt="OASIS, área de wellness de DINAMO" loading="lazy" />
               </div>
@@ -656,7 +665,7 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
               </div>
             </article>
 
-            <article class="eco-card rv" data-rv="scale" style="--d:1">
+            <article class="eco-card tint-lab rv" data-rv="scale" style="--d:1">
               <div class="media rv-img" data-par="0.08">
                 <img decoding="async" src="/img/lounge.jpg" alt="the lab, shake bar de DINAMO" loading="lazy" />
               </div>

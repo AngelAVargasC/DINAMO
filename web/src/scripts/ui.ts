@@ -167,7 +167,7 @@ const heroSec = document.getElementById("hero");
 const capas = Array.from(
   document.querySelectorAll<HTMLElement>("#hero [data-depth]")
 ).map((el) => ({
-  el: el.classList.contains("hero-figure") ? (el.querySelector("img") ?? el) : el,
+  el: el.classList.contains("hero-figure") ? (el.querySelector<HTMLElement>(".hero-figs") ?? el) : el,
   k: Number(el.dataset.depth) || 1,
   contra: el.classList.contains("hero-figure"),
 }));
@@ -189,6 +189,54 @@ if (heroSec && capas.length && !reduced) {
       setVar(c.el, "--dy", "0px");
     }
   });
+}
+
+/* ---------- carrusel de personas del hero ----------
+   Las figuras están apiladas en .hero-figs; aquí sólo se pasa la clase
+   .is-on de una a la siguiente y el CSS hace el fundido. Antes de dar el
+   relevo se espera a que la siguiente esté decodificada: si no, en la primera
+   vuelta el fundido llegaría a una imagen a medio cargar y se vería un
+   hueco. El bucle se para cuando el hero sale de pantalla o la pestaña pasa
+   a segundo plano: no tiene sentido fundir lo que nadie ve, y al volver no
+   se acumulan saltos. Con reduced-motion se queda la primera, quieta. */
+const figs = Array.from(document.querySelectorAll<HTMLImageElement>(".hero-figs img"));
+if (figs.length > 1 && !reduced) {
+  const PAUSA = 4200;
+  let actual = Math.max(0, figs.findIndex((f) => f.classList.contains("is-on")));
+  let temporizador = 0;
+  let enPantalla = true;
+
+  const relevo = () => {
+    const sig = (actual + 1) % figs.length;
+    const entra = figs[sig];
+    const sale = figs[actual];
+    const dar = () => {
+      sale.classList.remove("is-on");
+      sale.classList.add("is-off");
+      entra.classList.remove("is-off");
+      entra.classList.add("is-on");
+      actual = sig;
+    };
+    if (entra.complete && entra.naturalWidth) dar();
+    else entra.decode().then(dar, dar);
+  };
+  const arranca = () => {
+    if (!temporizador && enPantalla && !document.hidden) {
+      temporizador = window.setInterval(relevo, PAUSA);
+    }
+  };
+  const para = () => {
+    if (temporizador) window.clearInterval(temporizador);
+    temporizador = 0;
+  };
+  new IntersectionObserver(
+    ([e]) => {
+      enPantalla = e.isIntersecting;
+      enPantalla ? arranca() : para();
+    },
+    { threshold: 0.1 }
+  ).observe(figs[0].parentElement as Element);
+  document.addEventListener("visibilitychange", () => (document.hidden ? para() : arranca()));
 }
 
 /* ---------- botones magnéticos ----------
