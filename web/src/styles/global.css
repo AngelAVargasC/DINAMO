@@ -1321,13 +1321,45 @@ html.menu-lock { overflow: hidden; }
   background: linear-gradient(180deg, transparent 70%, rgba(0, 0, 0, 0.45) 100%);
   pointer-events: none;
 }
+/* El texto ya no va en flujo abajo a la derecha (caía encima de las piernas
+   del velocista, captura de Angel): se coloca en el hueco libre del centro-
+   izquierda, entre las barras y la pierna adelantada, y las tres líneas bajan
+   en ESCALERA hacia la izquierda, en la misma diagonal «/» de las barras y
+   del propio velocista. Posición en % de la sección porque el hueco es un
+   trozo de la foto (object-fit: cover, 68 % 60 %) y escala con ella. */
 .creed-inner {
-  position: relative;
+  position: absolute;
   z-index: 2;
+  left: 29%;
+  top: 28%;
   display: grid;
-  justify-items: end;
-  gap: 1.4rem;
-  max-width: 34rem;
+  justify-items: start;
+  gap: 0.9rem;
+  text-align: left;
+}
+/* Escalera: la primera línea es la más metida a la derecha, la última pega al
+   borde izquierdo del bloque. Cada línea se mueve por su cuenta: --dx/--dy
+   los escribe el paralaje del puntero y --sy la deriva de scroll, a distinta
+   profundidad por línea (ui.ts, bloque «YOU VS YOU interactivo»). */
+.creed-line .ln {
+  padding-left: calc((2 - var(--li, 0)) * 1em);
+  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 0);
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.creed-tag,
+.creed-mark {
+  transform: translate3d(var(--dx, 0px), calc(var(--dy, 0px) + var(--sy, 0px)), 0);
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+/* «tú» responde al puntero: se enciende un halo del amarillo de marca */
+.creed-line em {
+  transition: text-shadow 0.5s var(--ease);
+}
+.creed:hover .creed-line em {
+  text-shadow: 0 0 0.35em rgba(255, 231, 0, 0.55);
+}
+@media (prefers-reduced-motion: reduce) {
+  .creed-line .ln, .creed-tag, .creed-mark { transform: none; transition: none; }
 }
 .creed-mark { margin: 0.4rem 0 0; }
 /* OJO tamaño mínimo: las dos barras de la izquierda del isotipo van en la
@@ -1335,13 +1367,18 @@ html.menu-lock { overflow: hidden; }
    antialias las funde y el isotipo parece de DOS barras (captura de Angel). */
 .creed-mark svg { width: clamp(3.2rem, 3.8vw, 3.8rem); }
 @media (max-width: 760px) {
+  /* en móvil no hay hueco al centro: vuelve al flujo, abajo a la izquierda,
+     con una escalera corta para conservar el gesto diagonal */
   .creed { justify-items: start; text-align: left; }
-  .creed-inner { justify-items: start; }
+  .creed-inner { position: relative; left: auto; top: auto; justify-items: start; }
+  .creed-line .ln { padding-left: calc((2 - var(--li, 0)) * 0.55em); }
   .creed-media img { object-position: 62% 60%; }
 }
 .creed-line {
   font-weight: 200;
-  font-size: clamp(2.2rem, 5.4vw, 5rem);
+  /* mas pequeno que antes (5.4vw): tiene que caber en el hueco entre el
+     brazo trasero y el muslo del velocista */
+  font-size: clamp(2rem, 4.2vw, 4rem);
   line-height: 1.06;
   letter-spacing: -0.015em;
 }
@@ -1585,6 +1622,77 @@ html.menu-lock { overflow: hidden; }
     radial-gradient(60% 40% at 18% 100%, rgba(224, 101, 58, 0.7) 0%, transparent 70%),
     radial-gradient(50% 40% at 88% 96%, rgba(31, 127, 131, 0.7) 0%, transparent 70%);
 }
+/* OASIS y the lab NO llevan foto: la tarjeta repite el fondo de su propia
+   sección (aurora animada / morado con líneas y la palabra en contorno).
+   El fondo cubre siempre el ancho de la tarjeta expandida (62 vw), como la
+   foto de the shop, para que al animar flex-grow sólo cambie el recorte. */
+.eco-bg {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  width: 62vw;
+  margin-left: -31vw;
+  overflow: hidden;
+  z-index: 0;
+}
+.eco-bg-oasis { background-color: var(--oasis-indigo); }
+.eco-bg-oasis .oasis-aurora {
+  inset: -25%;
+  /* en la tarjeta no hay vecinos con los que fundirse: sin máscara */
+  mask-image: none;
+}
+.ecofs:not(.vis) .eco-bg .oasis-aurora { animation-play-state: paused; }
+.eco-bg-vertical {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.45em;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+.eco-bg-lab { background-color: var(--lab-deep); }
+.eco-bg-lab .lab-lines {
+  mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+}
+/* la palabra de la marca enorme, en contorno, como el marquee de the lab:
+   textura de fondo que se recorta por arriba y a la derecha */
+.eco-bg-word {
+  position: absolute;
+  left: 4%;
+  /* a media altura: arriba está el titular de la sección y abajo el rótulo */
+  top: 34%;
+  font-weight: 800;
+  font-stretch: 112%;
+  font-size: clamp(5rem, 13vw, 11rem);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.42);
+  pointer-events: none;
+}
+.eco-bg-lab .eco-bg-word { text-transform: lowercase; }
+.eco-bg-lab .eco-bg-word.pink {
+  top: 52%;
+  left: 42%;
+  font-size: clamp(3rem, 7vw, 6rem);
+  color: var(--lab-pink);
+  -webkit-text-stroke: 0;
+  opacity: 0.9;
+}
+/* deriva lenta, en sintonía con el Ken Burns de la foto de the shop */
+.eco-bg-word { animation: eco-drift 18s ease-in-out infinite alternate; }
+.ecofs:not(.vis) .eco-bg-word { animation-play-state: paused; }
+@keyframes eco-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-6%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eco-bg-word, .eco-bg .oasis-aurora { animation: none; }
+}
 .eco-body {
   position: absolute;
   z-index: 2;
@@ -1612,7 +1720,9 @@ html.menu-lock { overflow: hidden; }
   .ecofs .eco-card { height: clamp(22rem, 55vh, 30rem); }
   /* en columna la expansión no aplica: crecería en alto */
   .eco > .eco-card:hover { flex-grow: 1; }
-  .eco-card .media, .eco-card::after { inset: 0; width: auto; margin-left: 0; }
+  .eco-card .media, .eco-card .eco-bg, .eco-card::after { inset: 0; width: auto; margin-left: 0; }
+  .eco-bg-word { font-size: clamp(5rem, 26vw, 9rem); }
+  .eco-bg-lab .eco-bg-word.pink { font-size: clamp(2.6rem, 13vw, 4.5rem); left: 30%; }
 }
 
 /* ============================================================

@@ -287,6 +287,55 @@ function syncPars(sy: number) {
   }
 }
 
+/* ---------- YOU VS YOU interactivo ----------
+   Las tres líneas de «La única competencia eres tú», la etiqueta y el
+   isotipo van en escalera diagonal y cada pieza tiene su profundidad: con el
+   puntero se desplazan a distinto ritmo (--dx/--dy) y con el scroll derivan
+   en vertical también a distinto ritmo (--sy), así la escalera se abre y se
+   cierra al pasar. La primera línea es la más «cercana» (se mueve más). */
+const creedSec = document.querySelector<HTMLElement>(".creed");
+let creedPiezas: { el: HTMLElement; k: number }[] = [];
+let creedTop = 0;
+let creedH = 0;
+function measureCreed() {
+  if (!creedSec) return;
+  const lns = Array.from(creedSec.querySelectorAll<HTMLElement>(".creed-line .ln"));
+  const tag = creedSec.querySelector<HTMLElement>(".creed-tag");
+  const mark = creedSec.querySelector<HTMLElement>(".creed-mark");
+  creedPiezas = [
+    ...lns.map((el, i) => ({ el, k: 1 - i * 0.28 })),
+    ...(tag ? [{ el: tag, k: 0.3 }] : []),
+    ...(mark ? [{ el: mark, k: 0.18 }] : []),
+  ];
+  creedTop = absTop(creedSec);
+  creedH = creedSec.offsetHeight;
+}
+function syncCreed(sy: number) {
+  if (!creedSec || !creedPiezas.length) return;
+  const top = creedTop - sy;
+  if (top + creedH < 0 || top > innerHeight) return;
+  // -1 arriba del viewport, +1 abajo
+  const f = (top + creedH / 2 - innerHeight / 2) / innerHeight;
+  for (const p of creedPiezas) setVar(p.el, "--sy", `${(f * 90 * p.k).toFixed(1)}px`);
+}
+if (creedSec && !reduced) {
+  creedSec.addEventListener("pointermove", (e) => {
+    const r = creedSec.getBoundingClientRect();
+    const fx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+    const fy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+    for (const p of creedPiezas) {
+      setVar(p.el, "--dx", `${(fx * p.k * 22).toFixed(1)}px`);
+      setVar(p.el, "--dy", `${(fy * p.k * 14).toFixed(1)}px`);
+    }
+  });
+  creedSec.addEventListener("pointerleave", () => {
+    for (const p of creedPiezas) {
+      setVar(p.el, "--dx", "0px");
+      setVar(p.el, "--dy", "0px");
+    }
+  });
+}
+
 /* ---------- parallax de ventana (data-fix) ----------
    La foto mide la pantalla (100vh) y se contra-desplaza una fracción de lo que
    su marco lleva recorrido. Con factor 1 quedaría clavada al viewport, pero
@@ -914,6 +963,7 @@ let dirty = true;
 function measureAll() {
   measureReveals();
   measurePars();
+  measureCreed();
   measureFixed();
   measureKinetics();
   measureUni();
@@ -997,6 +1047,7 @@ function frame(now: number) {
   if (!reduced) {
     if (moved) {
       syncPars(sy);
+      syncCreed(sy);
       syncFixed(sy);
       syncCross(sy);
       syncKinetics(sy);

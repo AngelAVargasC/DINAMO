@@ -1,5 +1,81 @@
 # Bitácora — DINAMO
 
+## 2026-09-23 — «Marcas propias»: OASIS y the lab sin foto, con el fondo de su sección
+
+**Qué se hizo.** Angel pidió que las tarjetas de OASIS y the lab en
+«Marcas propias dentro del club» (`#ecosistema`) llevaran «el mismo diseño
+que tienen en su sección específica» en vez de las fotos (`spa.jpg`,
+`lounge.jpg`). the shop conserva su foto y su Ken Burns.
+- `index.astro`: en esas dos tarjetas el `.media` se sustituye por un
+  `.eco-bg` (`aria-hidden`). OASIS: `.oasis-aurora` (misma aurora animada de
+  la sección), el rótulo vertical TRAIN · RECOVER · FUEL y la palabra OASIS
+  enorme en contorno. the lab: `.lab-lines` (las líneas horizontales de la
+  sección), «the lab» en contorno y «the lab» en magenta más pequeño.
+- `global.css`: `.eco-bg` mide 62 vw centrado, igual que `.media`, para que
+  al expandir la tarjeta (`flex-grow`) sólo cambie el recorte, no el
+  encuadre. La aurora va sin `mask-image` dentro de la tarjeta (no hay
+  vecinos con los que fundirse) y se pausa con `.ecofs:not(.vis)`, como el
+  zoom de la foto. La palabra en contorno (`.eco-bg-word`) va a media
+  altura (`top: 34 %`): arriba pisaba el titular «Marcas propias», que vive
+  encima de las tarjetas, y abajo está el rótulo `.eco-body`. Deriva lenta
+  en X (`eco-drift`, 18 s) para acompañar al Ken Burns de the shop; sin
+  animación con `prefers-reduced-motion`. El velo de color `::after` de cada
+  tarjeta se mantiene: sigue dando contraste al texto de abajo.
+
+**Validado.** Build pasa. En Chrome a 1444×840: OASIS expandida muestra la
+aurora completa con la palabra en contorno; the lab expandida muestra
+líneas + contorno + magenta; en reposo cada tarjeta enseña un recorte
+central de su fondo (por diseño, igual que las fotos).
+
+**Qué quedó abierto.**
+- Angel: valorar si en reposo (tarjeta estrecha) el recorte de la palabra
+  («lab» / «the la») le gusta como textura o prefiere la palabra completa
+  ajustada al ancho de la tarjeta.
+- Móvil (≤900, tarjetas en columna) sólo verificado por código: el fondo
+  pasa a `inset: 0` y la palabra baja de tamaño.
+
+
+## 2026-09-22 — YOU VS YOU: texto en escalera diagonal, fuera del velocista
+
+**Qué se hizo.** En «La única competencia eres tú» el texto iba en flujo
+abajo a la derecha y caía encima de las piernas del velocista (captura de
+Angel: «que no se ponga encima de la persona corriendo, que quede en
+diagonal en los espacios vacíos y se vea más interactivo»).
+- `index.astro`: el titular pasa a **tres líneas explícitas** («La única /
+  competencia / eres tú.»); antes eran dos `<br>` y la tercera salía por
+  ajuste de ancho, y la escalera necesita una `.ln` por línea.
+- `global.css`: `.creed-inner` es ahora **absoluto** (`left: 29%; top: 28%`,
+  en % porque el hueco es un trozo de la foto con `object-fit: cover` y
+  escala con ella): el hueco entre el brazo trasero (arriba), las barras
+  (izquierda) y el muslo adelantado (derecha-abajo). Las líneas bajan en
+  **escalera hacia la izquierda** (`padding-left: (2 - --li) * 1em`), la
+  diagonal «/» de las barras y del propio velocista. Tipografía reducida de
+  5.4vw a `clamp(2rem, 4.2vw, 4rem)` para caber en el hueco. Etiqueta e
+  isotipo cierran la escalera abajo a la izquierda. En móvil (≤760) vuelve
+  al flujo abajo a la izquierda con escalera corta (0.55em).
+- `ui.ts`, bloque «YOU VS YOU interactivo»: cada pieza (3 líneas, etiqueta,
+  isotipo) tiene profundidad propia (1 / 0.72 / 0.44 / 0.3 / 0.18). Con el
+  puntero se desplazan a distinto ritmo (`--dx/--dy`, hasta 22×14 px) y con
+  el scroll derivan en vertical también a distinto ritmo (`--sy`, ±90 px ×
+  profundidad; `measureCreed`/`syncCreed` enganchados en `measureAll` y en
+  el bucle junto a `syncPars`). El «tú» amarillo enciende un halo al pasar
+  el puntero por la sección. Todo desactivado con `prefers-reduced-motion`.
+
+**Validado.** Geometría por DOM a 1652×928: «La única» en x 42–57 % /
+y 28–35 % (bajo el brazo), «competencia» 38–58 % / 35–42 % (a la izquierda
+del hombro), «eres tú.» 34–46 % / 42–48 %, etiqueta e isotipo debajo,
+todo a la izquierda de la pierna adelantada. Build pasa.
+
+**Qué quedó abierto.**
+- **Angel: mirar YOU VS YOU con la pestaña visible.** Las capturas de Chrome
+  salían con la pestaña oculta (rAF parado: el reveal a medias y la deriva
+  de scroll sin escribir), así que el paralaje de scroll y el hover del
+  «tú» sólo se verificaron por código, no en pantalla.
+- La posición en % se afinó para 16:9. En pantallas muy anchas (21:9) o
+  muy cuadradas el recorte de la foto cambia y el hueco se mueve: si el
+  texto pisa al velocista, ajustar `left/top` de `.creed-inner` por media
+  query de `aspect-ratio`.
+
 ## 2026-09-21 — Carrusel de personas en el hero
 
 **Qué se hizo.** La atleta fija del hero se sustituye por un **carrusel de

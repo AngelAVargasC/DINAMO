@@ -309,7 +309,7 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
         </div>
         <div class="wrap creed-inner">
           <p class="creed-line rv" data-lines style="--d:1">
-            La única competencia<br />eres <em>tú</em>.
+            La única<br />competencia<br />eres <em>tú</em>.
           </p>
           <p class="creed-tag rv" style="--d:2">You&nbsp;vs&nbsp;You</p>
           <!-- el isotipo cierra el bloque abajo a la derecha, como el logo de la
@@ -649,8 +649,11 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
 
           <div class="eco">
             <article class="eco-card tint-oasis rv" data-rv="scale">
-              <div class="media rv-img" data-par="0.08">
-                <img decoding="async" src="/img/spa.jpg" alt="OASIS, área de wellness de DINAMO" loading="lazy" />
+              <!-- fondo de la sección OASIS (aurora), no foto -->
+              <div class="eco-bg eco-bg-oasis" aria-hidden="true">
+                <div class="oasis-aurora"></div>
+                <p class="eco-bg-vertical">TRAIN&nbsp;&nbsp;·&nbsp;&nbsp;RECOVER&nbsp;&nbsp;·&nbsp;&nbsp;FUEL</p>
+                <span class="eco-bg-word">OASIS</span>
               </div>
               <div class="eco-body">
                 <h3>OASIS</h3>
@@ -663,8 +666,11 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
             </article>
 
             <article class="eco-card tint-lab rv" data-rv="scale" style="--d:1">
-              <div class="media rv-img" data-par="0.08">
-                <img decoding="async" src="/img/lounge.jpg" alt="the lab, shake bar de DINAMO" loading="lazy" />
+              <!-- fondo de la sección the lab (morado + líneas), no foto -->
+              <div class="eco-bg eco-bg-lab" aria-hidden="true">
+                <div class="lab-lines"></div>
+                <span class="eco-bg-word">the lab</span>
+                <span class="eco-bg-word pink">the lab</span>
               </div>
               <div class="eco-body">
                 <h3>the lab</h3>
