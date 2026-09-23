@@ -22,11 +22,29 @@ que tienen en su sección específica» en vez de las fotos (`spa.jpg`,
   animación con `prefers-reduced-motion`. El velo de color `::after` de cada
   tarjeta se mantiene: sigue dando contraste al texto de abajo.
 
-**También (misma sesión):** en «Equilibrio bajo la luz» (sección Pilates,
-`.split.rev`) la foto pasa de `terraza.jpg` a `fachada-noche.jpg` (la
-entrada del club de noche), a petición de Angel. El titular va ahora dentro
-de `.split-t` con el isotipo amarillo (`.split-iso`) a su derecha, mismo
-lockup que «Marcas propias». El copy no cambia. Sólo verificado con build.
+**Equilibrio bajo la luz (Pilates, `.split.rev`).** La foto pasa de
+`terraza.jpg` a `fachada-noche.jpg` (la entrada de noche), a petición de
+Angel. El titular va dentro de `.split-t` con el isotipo amarillo a su
+derecha (`.split-t-iso`). Ojo: la clase `.split-iso` YA EXISTÍA (isotipo
+absoluto sobre la foto, lo usa Recovery) y la primera versión la reutilizó
+por error: el isotipo salía encima de la fachada. Por eso el nombre propio.
+La sección lleva `.split-wide`: columnas `1fr 1.2fr`, la foto un 20 % más
+ancha que el texto (pedido de Angel). El copy sigue hablando del estudio
+acristalado: pendiente de decidir si se adapta a la fachada.
+
+**Un día (Entrena. Recupérate. Conecta.).** En el marco de la derecha
+(`.day-peek`) las filas The Lab y Oasis ya no muestran foto (`lounge.jpg`,
+`sauna.jpg`) sino un `.day-panel` con el fondo de su sección, reutilizando
+`.eco-bg-lab` / `.eco-bg-oasis` / `.eco-bg-word` de «Marcas propias».
+`ui.ts` recorre ahora `peek.children` (antes sólo `img`). `.day-peek` entra
+en la lista del observador `.vis` para pausar aurora y deriva fuera de
+pantalla.
+
+**Piezas de OASIS (`.ocard`).** Se recortaban los textos: la tarjeta era
+4:5 y la imagen iba a `scale(1.12)` con paralaje interno. Ahora
+`aspect-ratio: 821 / 1280` (medida real de los tres JPG) y sin zoom ni
+`data-par`; se conserva el tilt. Verificado por DOM: tarjeta e imagen miden
+lo mismo (0,641).
 
 **Validado.** Build pasa. En Chrome a 1444×840: OASIS expandida muestra la
 aurora completa con la palabra en contorno; the lab expandida muestra
@@ -39,6 +57,8 @@ central de su fondo (por diseño, igual que las fotos).
   ajustada al ancho de la tarjeta.
 - Móvil (≤900, tarjetas en columna) sólo verificado por código: el fondo
   pasa a `inset: 0` y la palabra baja de tamaño.
+- Copy de «Equilibrio bajo la luz»: habla del estudio acristalado y la foto
+  es ya la fachada. Angel decide si se reescribe.
 
 
 ## 2026-09-22 — YOU VS YOU: texto en escalera diagonal, fuera del velocista

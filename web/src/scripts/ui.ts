@@ -876,7 +876,8 @@ function syncUni(dt: number, sy: number) {
   const dayList = document.querySelector<HTMLElement>(".day");
   const peek = document.querySelector<HTMLElement>(".day-peek");
   if (dayList && peek) {
-    const peekImgs = Array.from(peek.querySelectorAll("img"));
+    // fotos o paneles de color (The Lab / Oasis): un hijo por fila
+    const peekImgs = Array.from(peek.children) as HTMLElement[];
     const rows = Array.from(dayList.querySelectorAll<HTMLElement>(".day-row"));
     const elegir = (i: number) => {
       rows.forEach((r, k) => r.classList.toggle("on", k === i));
@@ -997,7 +998,7 @@ addEventListener("load", requestMeasure);
    tocarlas en cada frame. La clase .vis la pone este observador. */
 {
   const watched = Array.from(document.querySelectorAll<HTMLElement>(
-    "#hero, #universo, #ecosistema, #oasis, .cross"
+    "#hero, #universo, #ecosistema, #oasis, .cross, .day-peek"
   ));
   if (watched.length && "IntersectionObserver" in window) {
     const io = new IntersectionObserver((entries) => {
