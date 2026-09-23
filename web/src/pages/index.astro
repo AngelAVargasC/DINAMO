@@ -504,11 +504,15 @@ const stamp = `<span class="stamp" aria-hidden="true"><b>DINAMO</b>${iso}</span>
       <!-- ═══════ PILATES ═══════ -->
       <section class="sec split rev bg-bone" data-theme="light">
         <div class="media rv-img" data-par="0.1">
-          <img decoding="async" src="/img/terraza.jpg" alt="Contorno Pilates: el estudio acristalado sobre la ciudad" loading="lazy" />
+          <img decoding="async" src="/img/fachada-noche.jpg" alt="La fachada de DINAMO de noche, con la entrada iluminada" loading="lazy" />
           <Fragment set:html={stamp} />
           </div>
         <div class="split-copy">
-          <h2 class="display rv" data-lines style="--d:1">Equilibrio<br />bajo la luz.</h2>
+          <!-- titular + isotipo a su derecha, mismo lockup que en «Marcas propias» -->
+          <div class="split-t">
+            <h2 class="display rv" data-lines style="--d:1">Equilibrio<br />bajo la luz.</h2>
+            <span class="split-iso rv" style="--d:2" aria-hidden="true"><Fragment set:html={iso} /></span>
+          </div>
           <p class="lede rv" style="--d:2">
             Un estudio acristalado sobre la ciudad, con reformers y grupos
             reducidos. El contrapeso perfecto a las sesiones de fuerza:

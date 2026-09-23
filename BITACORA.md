@@ -22,6 +22,12 @@ que tienen en su sección específica» en vez de las fotos (`spa.jpg`,
   animación con `prefers-reduced-motion`. El velo de color `::after` de cada
   tarjeta se mantiene: sigue dando contraste al texto de abajo.
 
+**También (misma sesión):** en «Equilibrio bajo la luz» (sección Pilates,
+`.split.rev`) la foto pasa de `terraza.jpg` a `fachada-noche.jpg` (la
+entrada del club de noche), a petición de Angel. El titular va ahora dentro
+de `.split-t` con el isotipo amarillo (`.split-iso`) a su derecha, mismo
+lockup que «Marcas propias». El copy no cambia. Sólo verificado con build.
+
 **Validado.** Build pasa. En Chrome a 1444×840: OASIS expandida muestra la
 aurora completa con la palabra en contorno; the lab expandida muestra
 líneas + contorno + magenta; en reposo cada tarjeta enseña un recorte
